@@ -1,0 +1,26 @@
+#' @docType data
+#' @title Brightness of Snacks
+#' @description This dataset its a part of a study development by the nutritional 
+#' department of USP (S\~{a}o Paulo University) such that is compared five new type 
+#' composition of the snack with low saturated fat and fatty acids.
+#' @format The "data" slot is a data frame with 150 observations on the following 4 variables.
+#' \describe{
+#' \item{y}{the brightness of the product on a scale of 0 to 100 (the higher the value the product lighter).}
+#' \item{x1}{its the type compositions for the news snacks.}
+#' \item{x2}{its the time (in weeks) when was measurements the brightness of the product.}
+#' \item{rot}{a characters vector that indicate the group-week-measurement for each snack.}
+#' }
+#' @usage data(luzdat)
+#' @references Paula, G. A., de Moura, A. S. and Yamaguchi, A. M. (2004). Relat\'{o}rio de an\'{a}lise estat\'{i}stica 
+#' sobre o projeto: estabilidade sensorial de snacks aromatizados com \'{o}leo de canola e gordura vegetal hidrogenada. RAE-CEA 04105, IME-USP. 
+#' @keywords datasets
+#' @examples
+#' data(luzdat)
+#' y <- luzdat$y
+#' x1 <- luzdat$x1 ; x1 <- factor(x1) ; x1 <- C(x1,treatment)
+#' x2 <- luzdat$x2
+#' x3 <- (luzdat$x2)^2
+#' luz <- data.frame(y,x1,x2,x3)
+#' elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Student(df=5)
+#' ,data=luz)
+"luzdat"
