@@ -7,7 +7,7 @@
 envelope(object, B = 100, arg = arg, ...)
 }
 \arguments{
-\item{object}{fit object for elliptical regression model.}
+\item{object}{an object with the result of the fitted elliptical regression model.}
 
 \item{B}{number of monte carlo simulations.}
 
@@ -16,7 +16,7 @@ envelope(object, B = 100, arg = arg, ...)
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
 \description{
-This function produces quantile-quantile plots with simulated envelope for response distribution in elliptical regression models.
+This function produces quantile-quantile residuals plot with simulated envelope for the specified error distribution in elliptical regression models.
 }
 \examples{
 data(luzdat)
@@ -35,8 +35,10 @@ symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
 \url{https://doi.org/10.1016/j.spl.2005.04.033}
 }
 \seealso{
-\code{\link{glm}}, \code{\link{elliptical}}, \code{\link{elliptical.diag}}
+\code{\link{glm}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
 }
 \keyword{elliptical}
+\keyword{models}
 \keyword{plots}
 \keyword{quantile-quantile}
+\keyword{residuals}

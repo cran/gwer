@@ -2,103 +2,113 @@
 % Please edit documentation in R/gwer.R
 \name{gwer}
 \alias{gwer}
+\alias{print.gwer}
 \title{Geographically Weighted Elliptical Regression}
 \usage{
-gwer(formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
-  spdisp = F, family = Normal, data = sys.parent(),
-  dispersion = NULL, weights, subset, fit.points,
-  na.action = "na.fail", method = "gwer.fit", longlat = NULL,
+gwer(formula, data = sys.parent(), coords, bandwidth,
+  gweight = gwr.Gauss, adapt = NULL, hatmatrix = FALSE, fit.points,
+  family = Normal, longlat = NULL, weights, dispersion = NULL,
+  subset, na.action = "na.fail", method = "gwer.fit",
   control = glm.control(epsilon = 1e-04, maxit = 100, trace = F),
-  model = F, x = F, y = T, contrasts = NULL, parplot = F, offset,
-  type = "pearson", gwr.diag = F, ...)
+  model = FALSE, x = FALSE, y = TRUE, contrasts = NULL, offset,
+  type = "pearson", spdisp = FALSE, parplot = FALSE, ...)
 }
 \arguments{
 \item{formula}{regression model formula as in \code{glm}.}
 
+\item{data}{model data frame, or may be a SpatialPointsDataFrame or SpatialPolygonsDataFrame as defined in package \pkg{sp}.}
+
 \item{coords}{matrix of coordinates of points representing the spatial positions of the observations.}
 
-\item{bandwidth}{value of the selected bandwidth (see \code{gwer.sel} for bandwidth optimization).}
+\item{bandwidth}{value of the selected bandwidth used in the weighting function (see \code{gwer.sel} for bandwidth optimization).}
 
 \item{gweight}{geographical weighting function, at present \code{gwr.Gauss()} is default.}
 
 \item{adapt}{defines the type of bandwidth used. either NULL (default) or a proportion between 0 and 1 of observations to include in weighting scheme (k-nearest neighbours).}
 
-\item{spdisp}{if TRUE dispersion parameter varies geographically.}
+\item{hatmatrix}{if TRUE, return the hatmatrix as a component of the result, ignored if fit.points given}
+
+\item{fit.points}{an object containing the coordinates of fit points, often an object from package \pkg{sp}. If missing, the coordinates given through the data argument object, or the coords argument are used.}
 
 \item{family}{a description of the error distribution to be used in the model (see \code{elliptical.family} for details of family functions).}
 
-\item{data}{model data frame, or may be a SpatialPointsDataFrame or SpatialPolygonsDataFrame as defined in package \pkg{sp}.}
+\item{longlat}{TRUE if point coordinates are longitude-latitude decimal degrees, in which case distances are measured in kilometers. If x is a SpatialPoints object, the value is taken from the object itself.}
+
+\item{weights}{an optional numeric vector of weights to be used in the fitting process.}
 
 \item{dispersion}{an optional fixed value for dispersion parameter.}
 
-\item{weights}{an optional vector of weights to be used in the fitting process for local models.}
-
-\item{subset}{an optional vector specifying a subset of observations to be used in the fitting process.}
-
-\item{fit.points}{an object containing the coordinates of fit points, often an object from package \pkg{sp}. If missing, the coordinates given through the data argument object, or the coords argument are used.}
+\item{subset}{an optional numeric vector specifying a subset of observations to be used in the fitting process.}
 
 \item{na.action}{a function which indicates what should happen when the data contain NAs (see \code{glm}).}
 
 \item{method}{the method to be used in fitting local models. The default method "gwer.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.}
 
-\item{longlat}{TRUE if point coordinates are longitude-latitude decimal degrees, in which case distances are measured in kilometers. If x is a SpatialPoints object, the value is taken from the object itself.}
+\item{control}{a list of parameters for controlling the fitting process. For \code{elliptical} this is passed by \code{glm.control}.}
 
-\item{control}{a list of parameters for controlling the fitting process. For \code{gwer.fit} this is passed to \code{glm.control}.}
+\item{model}{a logical value indicating whether model frame should be included as a component of the return.}
 
-\item{model}{a logical value indicating whether model frame should be included as a component of the returned value.}
+\item{x}{a logical value indicating whether the response vector used in the fitting process should be returned as components of the return.}
 
-\item{x}{a logical value indicating whether the response vector used in the fitting process should be returned as components of the returned value.}
-
-\item{y}{a logical value indicating whether model matrix used in the fitting process should be returned as components of the returned value.}
+\item{y}{a logical value indicating whether model matrix used in the fitting process should be returned as components of the return.}
 
 \item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.}
 
-\item{parplot}{if TRUE the parameters boxplots are plotted.}
-
 \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting as in \code{glm}.}
 
-\item{type}{character that indicates the type of residuals should consider as return.}
+\item{type}{a character string that indicates the type of residuals should consider as return.}
 
-\item{gwr.diag}{if TRUE is calculated the diagnostic measures of the model and provided in return.}
+\item{spdisp}{if TRUE dispersion parameter varies geographically.}
+
+\item{parplot}{if TRUE the parameters boxplots are plotted.}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
 \value{
-A list of class \dQuote{gwer}:   
+returns an object of class \dQuote{gwer}, a list with follow components:   
 \item{SDF}{a SpatialPointsDataFrame (may be gridded) or SpatialPolygonsDataFrame object (see package \pkg{sp}) with fit.points, weights, GWR coefficient estimates, dispersion and the residuals of \code{type} in its \code{data} slot.}
-\item{coef}{regression parameters matrix of the fitted model.}
-\item{se}{standard errors matrix for the parameters of the fitted model.}
-\item{pvalue}{p-value matrix for the significance tests of parameters of the fitted model.}
-\item{lhat}{hat matrix of the geographically weighted elliptical model.}
-\item{lm}{elliptical regression on the same model formula.}  
-\item{Weights}{matrix for geographical weighting.}
-\item{results}{a list of results values for fitted geographically weighted elliptical model.}
+\item{coef}{the matrices of coefficients, standard errors and significance values for parameters hypothesis test.}
+\item{dispersion}{either the supplied argument or the estimated dispersion with standard error.}
+\item{hat}{hat matrix of the geographically weighted elliptical model.}
+\item{lm}{elliptical global regression on the same model formula.}  
+\item{results}{a list of results values for fitted geographically weighted elliptical model.}  
+\item{bandwidth}{the bandwidth used in geographical weighting function.}
 \item{fitted}{the fitted mean values of the geographically weighted elliptical model.}
-\item{diag}{a list of diagnostic matrices ('leverage', 'global influence' and 'local influence'), see \code{elliptical.diag} for more details.}
-\item{residuals}{a list of all residuals type ('ordinal', 'studentized' and 'deviance').}
+\item{hatmatrix}{a logical value indicating if hatmatrix was considered}
+\item{gweights}{a matrix with the geographical weighting for all local elliptical models.}
+\item{family}{the \code{family} object used.}
+\item{flm}{a matrix with the fitted values for all local elliptical models.}
+\item{adapt}{the \code{adapt} object used.}
+\item{gweight}{the \code{gweights} object used.}
+\item{spdisp}{the \code{spdisp} object used.}
 \item{this.call}{the function call used.}
+\item{fp.given}{the \code{fp.given} object used.}
+\item{longlat}{the \code{longlat} object used.}
+\item{type}{the \code{type} residuals for the object used.}
 }
 \description{
-The function implements geographically weighted elliptical regression to explore the non-stationarity for certain global bandwidth and chosen weighting scheme.
+The function fit geographically weighted elliptical regression  model to explore the non-stationarity for a certain bandwidth and  weighting function.
 }
 \examples{
 data(columbus, package="spData")
 fit.lm <- lm(CRIME ~ INC, data=columbus)
 summary(fit.lm)
 gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Normal(),
+                 coords=cbind(columbus$X, columbus$Y), method = 'aic')
+gwer.fit <- gwer(CRIME ~ INC, family = Normal(), bandwidth = gwer.bw, hatmatrix = TRUE, 
+                 spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
                  coords=cbind(columbus$X, columbus$Y))
-fit.gwer <- gwer(CRIME ~ INC, family = Normal(), bandwidth = gwer.bw, 
-                 parplot = TRUE, data=columbus, method = "gwer.fit",
-                 coords=cbind(columbus$X, columbus$Y))
+print(gwer.fit) 
 \donttest{
 data(columbus, package="spData")
-fit.lm <- lm(CRIME ~ INC, data=columbus)
-summary(fit.lm)
+fit.elliptical <- elliptical(CRIME ~ INC, family = Student(df=4), data=columbus)
+summary(fit.elliptical)
 gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Student(df=4),
                  coords=cbind(columbus$X, columbus$Y), method = 'aic')
-gwer.fitt <- gwer(CRIME ~ INC, family = Student(df=4), bandwidth = gwer.bw, 
-                 parplot = TRUE, data=columbus, method = "gwer.fit",
+gwer.fitt <- gwer(CRIME ~ INC, family = Student(df=4), bandwidth = gwer.bw, hatmatrix = TRUE,
+                 spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
                  coords=cbind(columbus$X, columbus$Y))
+print(gwer.fitt)  
 }
 }
 \references{
@@ -106,12 +116,20 @@ Brunsdon, C., Fotheringham, A. S. and Charlton, M. E. (1996).
 Geographically weighted regression: a method for exploring spatial nonstationarity.
 Geographical analysis, 28(4), 281-298. \url{https://doi.org/10.1111/j.1538-4632.1996.tb00936.x}
 
+Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
+symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
+\url{https://doi.org/10.1016/j.spl.2007.01.012}
+
 Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 }
 \seealso{
 \code{\link{gwer.sel}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
 }
-\keyword{elliptical}
+\keyword{Bandwidth}
+\keyword{Elliptical}
+\keyword{Geographically}
 \keyword{model}
-\keyword{spatial}
+\keyword{optimization}
+\keyword{regression}
+\keyword{weighted}

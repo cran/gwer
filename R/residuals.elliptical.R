@@ -1,16 +1,20 @@
-#' @title Extract Model Residuals
+#' @title Extract Residuals for Elliptical Model Fits
 #' @method residuals elliptical
-#' @description residuals is a generic function which extracts model residuals from objects returned by modeling functions.
-#' @param object fit object for elliptical regression model.
-#' @param type an character string that indicates the type of residuals.
+#' @description This function compute differents type of residuals to the fitted elliptical regression model.
+#' @param object an object with the result of the fitted elliptical regression model.
+#' @param type a character string that indicates the type of residuals. If is \code{stand} will be computed the standar residuals. 
+#' If is \code{ordinal} will be computed the ordinal residuals. If is \code{response} will be computed the response residuals. 
+#' If is \code{pearson} will be computed the pearson residuals. If is \code{desvio} will be computed the desviance residuals.
+#' By default is \code{stand}.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
-#' @return Residuals extracted from the \code{object}.
+#' @return Residuals of the specific \code{type} extracted from the \code{object}.
 #' @references Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
 #' symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
 #' \url{https://doi.org/10.1016/j.spl.2005.04.033}
 #' @seealso \code{\link{elliptical}}
-#' @keywords elliptical
-#' @keywords residuals
+#' @keywords Linear regression models
+#' @keywords Elliptical models
+#' @keywords Residuals
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y
@@ -20,24 +24,40 @@
 #' luz <- data.frame(y,x1,x2,x3)
 #' elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Student(df=5)
 #' ,data=luz)
-#' residuals(elliptical.fitt)
+#' residuals(elliptical.fitt, type = "stand")
 #' @export
 
-residuals.elliptical<- function (object, type = c("stand", "pearson", "response"),...) 
+residuals.elliptical<- function (object, type = c("stand", "ordinal", "response", "pearson", "desvio"), ...) 
 {
   type <- match.arg(type)
-  rr <- switch(type, pearson = object$resid/sqrt(object$scalevariance), 
-               stand = {
-                 Xd <- as.matrix(object$Xmodel)
-                 Xdi <- solve(t(Xd) %*% Xd)
-                 H <- Xd %*% Xdi %*% t(Xd)
-                 H1 <- (1/(object$scalevariance * object$scale)) * 
-                   H
-                 varr <- object$scalevariance * object$dispersion * 
-                   (1 - diag(H1))
-                 ri <- object$y - object$fitted
-                 ri/sqrt(varr)
-               }, response = object$y - object$fitted)
+
+  family <- object$family
+  dispersion <-object$dispersion
+  rord <- object$y - object$fitted
+  resid <- (object$y - object$fitted)/sqrt(dispersion)
+    
+  Xd <- as.matrix(object$Xmodel)
+  Xdi <- solve(t(Xd) %*% Xd)
+  H <- Xd %*% Xdi %*% t(Xd)
+  H1 <- (1/(object$scalevariance * object$scale)) * H
+  varr <- object$scalevariance * (1 - diag(H1))
+  rstand <- resid/sqrt(varr)
+  
+  rpearson <- resid/sqrt(object$scalevariance)
+  
+  n <- length(resid) ;rdesvio <- rep(0,n)
+  u <- (object$y - object$fitted)^2/dispersion
+  for(i in 1:n){
+    logg0 <- family$g0(0, df = family$df, s = family$s, 
+                       r = family$r, alpha = family$alpha, mp = family$mp, 
+                       epsi = family$epsi, sigmap = family$sigmap, k = family$k)
+    loggu <- family$g0(u[i], df = family$df, s = family$s, 
+                       r = family$r, alpha = family$alpha, mp = family$mp, 
+                       epsi = family$epsi, sigmap = family$sigmap, k = family$k)
+    rdesvio[i] <- (sign(resid[i]))*(2*logg0 - 2*loggu)^(.5)
+  }
+  
+  rr <- switch(type, ordinal = rord, response = resid, pearson = rpearson, stand = rstand, desvio = rdesvio)
   if (is.null(object$na.action)) 
     rr
   else naresid(object$na.action, rr)

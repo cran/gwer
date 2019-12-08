@@ -4,33 +4,44 @@
 \alias{elliptical.diag.plots}
 \title{Diagnostic Plots for Elliptical Regression Models}
 \usage{
-elliptical.diag.plots(ellipticalfit, ellipticaldiag = NULL, weighting,
-  which, subset = NULL, iden = F, labels = NULL, ret = F, ...)
+elliptical.diag.plots(object, ellipticaldiag = NULL, which,
+  subset = NULL, iden = FALSE, labels = NULL, ret = FALSE, ...)
 }
 \arguments{
-\item{ellipticalfit}{fit object for elliptical regression model.}
+\item{object}{an object with the result of the fitted elliptical regression model.}
 
-\item{ellipticaldiag}{objects containing the diagnostic measures, by default obtained from object.}
+\item{ellipticaldiag}{objects containing the diagnostic measures. If is \code{NULL} (by default) is obtained from object.}
 
-\item{weighting}{type of model weighting used.}
+\item{which}{an optional numeric value with the number of plot returned.}
 
-\item{which}{an optional numerical that indicates which plot is returned.}
+\item{subset}{an optional numeric vector specifying a subset of observations to be used in the fitting process.}
 
-\item{subset}{optional vector specifying a subset of observations to be used in the fitting process.}
+\item{iden}{a logical value used to identify observations. If \code{TRUE} the observations are identified in the graphic window.}
 
-\item{iden}{a logical value used to identify observations. if TRUE the observations can be identified in the graphic window.}
+\item{labels}{a optinal string vector specifying a labels plots.}
 
-\item{labels}{a optinal vector specifying a labels plots.}
+\item{ret}{a logical value to return the diagnostic measures computing. If \code{FALSE} (by default) not return the diagnostic measures.}
 
-\item{ret}{a logical value to indicate funtion returns. If TRUE the return of the function will be to the diagnostic measures used.}
-
-\item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
+\item{...}{graphics parameters to be passed to the plotting routines.}
 }
 \value{
-If \code{ret} is true, returns a list of diagnostic arrays (see \code{elliptical.diag} for more details).
+Return an interactive menu with eleven options to make plots. This menu contains the follows graphics :
+1: plot: All.
+2: plot: Response residual against fitted values.
+3: plot: Response residual against index.
+4: plot: Standardized residual against fitted values.
+5: plot: Standardized residual against index.
+6: plot: QQ-plot of  response residuals.
+7: plot: QQ-plot of  Standardized residuals.
+8: plot: Generalized Leverage.
+9: plot: Local influence on the response against index.
+10: plot: Local influence on the scale against index.
+11: plot: Local influence for case-weight against index.
+If \code{which} is provided return an unique graphic selected. If \code{ret} is \code{TRUE} returns a list of diagnostic arrays 
+(see \code{elliptical.diag} for more details).
 }
 \description{
-This function produces diagnostic measures plots for elliptical regression models.
+This function generate diagnostic measures plots for the fitted elliptical regression models.
 }
 \examples{
 data(luzdat)
@@ -51,6 +62,7 @@ symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
 \seealso{
 \code{\link{elliptical}}, \code{\link{elliptical.diag}}
 }
-\keyword{diagnostic}
-\keyword{elliptical}
+\keyword{Diagnostic}
+\keyword{Elliptical}
 \keyword{methods}
+\keyword{models}

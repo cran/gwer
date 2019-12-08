@@ -4,38 +4,35 @@
 \alias{elliptical.diag}
 \title{Diagnostic for Elliptical Regression Models}
 \usage{
-elliptical.diag(ellipticalfit, weighting = "observed", ...)
+elliptical.diag(object, ...)
 }
 \arguments{
-\item{ellipticalfit}{fit object for elliptical regression model.}
-
-\item{weighting}{type of model weighting used.}
+\item{object}{an object with the result of the fitted elliptical regression model.}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
 \value{
-returns a list of diagnostic arrays:
-\item{resid}{ordinal residuals for the fit model.}
-\item{rs}{studentized residuals for the fit model.}
-\item{dispersion}{coefficient of dispersion for the model fit.}
-\item{GL}{generalized leverage for the model fit.}
-\item{GLbeta}{generalized leverage of location parameters estimation for the model fit.}
-\item{GLphi}{generalized leverage of dispersion parameters estimation for the model fit.}  
-\item{Bi}{generalized leverage weighted by dispersion for the model fit.}
-\item{Om}{observed fisher information matrix of the model fit.}
-\item{Iom}{expected fisher information matrix of the model fit.}  
-\item{a, b, c}{the value of D(a), D(b) and D(c), respectively, for the model fit.}
-\item{Cmax}{matrix of local influence for additive perturbation in response.}
-\item{Lmax}{matrix of local influence on coefficients (additive perturbation in predictors).}
-\item{Cic}{matrix of local influence for case-weight perturbation (Ci).}
-\item{dmax}{matrix of local influence for case-weight perturbation (dmax).}
-\item{dmaxc}{matrix of local influence for case-weight perturbation (|dmax|).}
-\item{Ci}{matrix of local influence on the scale.}
-\item{Cih}{main diagonal of the matrix of local influence on the scale.}
-\item{h}{main diagonal of the hat matrix.}
+Returns a list of diagnostic arrays:
+\item{ro}{Ordinal residuals.}
+\item{rr}{Response residuals.}
+\item{rp}{Pearson residuals.}
+\item{rs}{Studentized residuals.}
+\item{rd}{Deviance residuals.}
+\item{dispersion}{Coefficient of dispersion.}
+\item{H}{The hat matrix.}
+\item{h}{Main diagonal of the hat matrix.}
+\item{GL}{Generalized leverage.}
+\item{GLbeta}{Generalized leverage of location parameters estimation.}
+\item{GLphi}{Generalized leverage of dispersion parameters estimation.}  
+\item{DGbeta}{Cook distance of location parameters estimation.}
+\item{DGphi}{Cook distance of dispersion parameters estimation.}  
+\item{Cic}{Normal curvature for case-weight perturbation.}
+\item{Cih}{Normal curvature for scale perturbation.}
+\item{Lmaxr}{Local influence on response (additive perturbation in responce).}
+\item{Lmaxc}{Local influence on coefficients (additive perturbation in predictors).}
 }
 \description{
-This function obtains the values of the residuals and calculates the diagnostic measures for elliptical regression models.
+This function obtains the values of differents residuals types and calculates the diagnostic measures for the fitted elliptical regression model.
 }
 \examples{
 data(luzdat)
@@ -56,6 +53,7 @@ symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
 \seealso{
 \code{\link{elliptical}}
 }
-\keyword{diagnostic}
-\keyword{elliptical}
+\keyword{Diagnostic}
+\keyword{Elliptical}
 \keyword{methods}
+\keyword{models}

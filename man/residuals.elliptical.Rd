@@ -2,23 +2,26 @@
 % Please edit documentation in R/residuals.elliptical.R
 \name{residuals.elliptical}
 \alias{residuals.elliptical}
-\title{Extract Model Residuals}
+\title{Extract Residuals for Elliptical Model Fits}
 \usage{
-\method{residuals}{elliptical}(object, type = c("stand", "pearson",
-  "response"), ...)
+\method{residuals}{elliptical}(object, type = c("stand", "ordinal",
+  "response", "pearson", "desvio"), ...)
 }
 \arguments{
-\item{object}{fit object for elliptical regression model.}
+\item{object}{an object with the result of the fitted elliptical regression model.}
 
-\item{type}{an character string that indicates the type of residuals.}
+\item{type}{a character string that indicates the type of residuals. If is \code{stand} will be computed the standar residuals. 
+If is \code{ordinal} will be computed the ordinal residuals. If is \code{response} will be computed the response residuals. 
+If is \code{pearson} will be computed the pearson residuals. If is \code{desvio} will be computed the desviance residuals.
+By default is \code{stand}.}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
 \value{
-Residuals extracted from the \code{object}.
+Residuals of the specific \code{type} extracted from the \code{object}.
 }
 \description{
-residuals is a generic function which extracts model residuals from objects returned by modeling functions.
+This function compute differents type of residuals to the fitted elliptical regression model.
 }
 \examples{
 data(luzdat)
@@ -29,7 +32,7 @@ x3 <- (luzdat$x2)^2
 luz <- data.frame(y,x1,x2,x3)
 elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Student(df=5)
 ,data=luz)
-residuals(elliptical.fitt)
+residuals(elliptical.fitt, type = "stand")
 }
 \references{
 Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
@@ -39,5 +42,8 @@ symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
 \seealso{
 \code{\link{elliptical}}
 }
-\keyword{elliptical}
-\keyword{residuals}
+\keyword{Elliptical}
+\keyword{Linear}
+\keyword{Residuals}
+\keyword{models}
+\keyword{regression}

@@ -3,7 +3,7 @@
 \docType{data}
 \name{luzdat}
 \alias{luzdat}
-\title{Brightness of Snacks}
+\title{Brightness of Snacks Dataset}
 \format{The "data" slot is a data frame with 150 observations on the following 4 variables.
 \describe{
 \item{y}{the brightness of the product on a scale of 0 to 100 (the higher the value the product lighter).}

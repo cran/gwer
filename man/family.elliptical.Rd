@@ -2,29 +2,65 @@
 % Please edit documentation in R/family.elliptical.R
 \name{family.elliptical}
 \alias{family.elliptical}
+\alias{Cauchy}
+\alias{Normal}
+\alias{LogisI}
+\alias{LogisII}
+\alias{Student}
+\alias{Powerexp}
+\alias{Glogis}
+\alias{Gstudent}
+\alias{Cnormal}
 \title{Family Objects for Elliptical Models}
 \usage{
 \method{family}{elliptical}(object, ...)
+
+Normal()
+
+Cauchy()
+
+LogisI()
+
+LogisII()
+
+Student(df = stop("no df argument"))
+
+Powerexp(k = stop("no k argument"))
+
+Glogis(parma = stop("no alpha=alpha(m) or m argument"))
+
+Gstudent(parm = stop("no s or r argument"))
+
+Cnormal(parmt = stop("no epsi or sigma argument"))
 }
 \arguments{
-\item{object}{fit object for elliptical regression model.}
+\item{object}{an object with the result of the fitted elliptical regression model.}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
+
+\item{df}{degrees of freedom.}
+
+\item{k}{shape parameter.}
+
+\item{parma}{parameter vector (alpha, m).}
+
+\item{parm}{parameter vector (s, r) for this distribuition.}
+
+\item{parmt}{parameters vector (epsi, sigma).}
 }
 \value{
-An object of class "family" (which has a concise print method). This is a list with elements:
+An object of class \dQuote{family} specifying a list with the follows elements:
 \item{family}{character: the family name.}
 \item{g0, g1, g2, g3, g4, g5}{derived fuctions associated with the distribution family defined.}
 \item{df}{degree of freedom for t-student distribution.}
 \item{s, r}{shape parameters for generalized t-student distribution.}
 \item{alpha}{shape parameter for contaminated normal and generalized logistic distributions.}  
 \item{mp}{shape parameter for generalized logistic distribution.}
-\item{epsi}{dispersion parameter for contaminated normal distribution.}
-\item{sigmap}{dispersion parameter for contaminated normal distribution.}
+\item{epsi,sigmap}{dispersion parameters for contaminated normal distribution.}
 \item{k}{shape parameter for power exponential distribution.}
 }
 \description{
-Family objects provide a convenient way to specify the details of the models used by functions such as \code{elliptical}. See the documentation for \code{elliptical} or \code{egwr} for the details on how such model fitting takes place.
+Family object provide an specify the details of the model used by functions such as \code{elliptical} and \code{gwer}. See the documentation for \code{elliptical} or \code{gwer} for more details.
 }
 \examples{
 data(luzdat)
@@ -44,5 +80,6 @@ Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 \seealso{
 \code{\link{elliptical}}, \code{\link{gwer}}
 }
+\keyword{Elliptical}
 \keyword{distributions}
-\keyword{elliptical}
+\keyword{models}

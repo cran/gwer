@@ -4,23 +4,23 @@
 \alias{anova.elliptical}
 \title{Analysis of Deviance for Elliptical Model Fits}
 \usage{
-\method{anova}{elliptical}(object, dispersion = NULL,
-  test = c("Chisq"), ...)
+\method{anova}{elliptical}(object, ..., dispersion = NULL,
+  test = c("Chisq"))
 }
 \arguments{
-\item{object}{fit object for elliptical regression model.}
+\item{object}{an object with the result of the fitted elliptical regression model.}
 
-\item{dispersion}{the dispersion parameter for the fitting family, by default obtained from object.}
+\item{...}{additional objects of the same type.}
 
-\item{test}{a character string representing that hypothesis test should be considered.}
+\item{dispersion}{the dispersion parameter for the fitting family. If is \code{NULL} (by default) is obtained from object.}
 
-\item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
+\item{test}{a character string containing the hypothesis test considered. By default is used the chi-square test.}
 }
 \value{
-An object of class \code{anova} inheriting from class \code{data.frame}
+Return an object of class \dQuote{anova}. This object contain the analysis of deviance.
 }
 \description{
-Compute an analysis of deviance table for one or more elliptical model fits.
+Compute an analysis of deviance table for the fitted elliptical regression model.
 }
 \examples{
 data(luzdat)
@@ -31,7 +31,7 @@ x3 <- (luzdat$x2)^2
 luz <- data.frame(y,x1,x2,x3)
 elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Student(df=5),
 data=luz)
-anova(elliptical.fitt)
+anova(elliptical.fitt, test = "Chisq")
 }
 \references{
 Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
@@ -39,7 +39,10 @@ symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090.
 \url{https://doi.org/10.1016/j.spl.2007.01.012}
 }
 \seealso{
-\code{\link{elliptical}}
+\code{\link{elliptical}}, \code{\link{summary.elliptical}}, \code{\link{family.elliptical}}
 }
 \keyword{ANOVA}
-\keyword{elliptical}
+\keyword{Elliptical}
+\keyword{Hypothesis}
+\keyword{models}
+\keyword{tests}

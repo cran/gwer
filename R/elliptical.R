@@ -1,45 +1,53 @@
 #' @title Elliptical Regression Models
 #' @import stats
 #' @import assertthat
-#' @description The function implements linear elliptical regression models, specified by giving a symbolic description of the systematic and stochastic components.
+#' @name elliptical
+#' @aliases print.elliptical
+#' @description The function implements linear elliptical regression models. This models is specified giving a symbolic description of the systematic and stochastic components.
 #' @param formula regression model formula as in \code{glm}.
 #' @param family a description of the error distribution to be used in the model (see \code{elliptical.family} for details of family functions).
 #' @param data an optional data frame, list or environment containing the variables in the model.
 #' @param dispersion an optional fixed value for dispersion parameter.
-#' @param weights an optional vector of weights to be used in the fitting process.
-#' @param subset an optional vector specifying a subset of observations to be used in the fitting process.
+#' @param weights an optional numeric vector of weights to be used in the fitting process.
+#' @param subset an optional numeric vector specifying a subset of observations to be used in the fitting process.
 #' @param na.action a function which indicates what should happen when the data contain NAs (see \code{glm}).
 #' @param method optimization method used to estimate the parameters. The default method "elliptical.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.
-#' @param control a list of parameters for controlling the fitting process. For \code{egwr.fit} this is passed to \code{glm.control}.
-#' @param model a logical value indicating whether model frame should be included as a component of the returned value.
-#' @param x a logical value indicating whether the response vector used in the fitting process should be returned as components of the returned value.
-#' @param y a logical value indicating whether model matrix used in the fitting process should be returned as components of the returned value.
+#' @param control a list of parameters for controlling the fitting process. For \code{elliptical} this is passed by \code{glm.control}.
+#' @param model a logical value indicating whether model frame should be included as a component of the return.
+#' @param x a logical value indicating whether the response vector used in the fitting process should be returned as components of the return.
+#' @param y a logical value indicating whether model matrix used in the fitting process should be returned as components of the return.
 #' @param contrasts an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.
 #' @param offset this can be used to specify an a priori known component to be included in the linear predictor during fitting as in \code{glm}.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
-#' @return A list of class \dQuote{elliptical}:   
-#' \item{coefficients}{coefficients of location of the model fit.}
-#' \item{dispersion}{coefficients of dispersion of the model fit.}
-#' \item{residuals}{the standardized residuals, that is the residuals in the final iteration of the optimization process.}
+#' @return returns an object of class \dQuote{elliptical}, a list with follow components: 
+#' \item{coefficients}{coefficients of location parameters.}
+#' \item{dispersion}{coefficient of dispersion parameter.}
+#' \item{residuals}{standardized residuals.}
 #' \item{fitted.values}{the fitted mean values.}
-#' \item{loglik}{the likelihood logarithm value of the adjusted model's.}  
-#' \item{Wg}{the values of the function W_g(u).}
-#' \item{Wgder}{the values of the function W^'_g(u).}
-#' \item{v}{the values of the function V(u).}
-#' \item{rank}{the numeric rank of the fitted linear model.}
-#' \item{inter}{the number of iterations of optimization process.}
-#' \item{scale}{the values of the 4d_g for the specified distribution.}
-#' \item{scaledispersion}{the values of the 4f_g for the specified distribution.}
-#' \item{scalevariance}{the values of the scale variance for the specified distribution.}
-#' \item{df}{the degrees of freedom for fitted model.}
-#' \item{Xmodel}{is the model matrix.}
+#' \item{loglik}{the likelihood logarithm value for the fitted model.}  
+#' \item{Wg}{values of the function \code{W_g(u)}.}
+#' \item{Wgder}{values for the function \code{W^{(1)}_g(u)}.}
+#' \item{v}{values for the function \code{V(u)}.}
+#' \item{rank}{the numeric rank for the fitted model.}
+#' \item{R}{the matrix of correlation for the estimated parameters.}
+#' \item{inter}{number of iterations of optimization process.}
+#' \item{scale}{values of the \code{4d_g} for the specified distribution.}
+#' \item{scaledispersion}{values of the \code{4f_g} for the specified distribution.}
+#' \item{scalevariance}{values of the scale variance for the specified distribution.}
+#' \item{df}{degree of freedom for t-student distribution.}
+#' \item{s, r}{shape parameters for generalized t-student distribution.}
+#' \item{alpha}{shape parameter for contaminated normal and generalized logistic distributions.}  
+#' \item{mp}{shape parameter for generalized logistic distribution.}
+#' \item{epsi,sigmap}{dispersion parameters for contaminated normal distribution.}
+#' \item{k}{shape parameter for power exponential distribution.}
+#' \item{Xmodel}{the model matrix.}
 #' \item{weights}{the working weights, that is the weights in the final iteration of optimization process}
 #' \item{df.residuals}{the residual degrees of freedom.}
 #' \item{family}{the \code{family} object used.}
-#' \item{formula}{the formula supplied.}
+#' \item{formula}{the \code{formula} supplied.}
 #' \item{terms}{the \code{terms} object used.}
 #' \item{contrasts}{(where relevant) the contrasts used.}
-#' \item{control}{the value of the\code{control} argument used.}
+#' \item{control}{the value of the \code{control} argument used.}
 #' \item{call}{the matched call.}
 #' \item{y}{the response variable used.}
 #' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
@@ -47,9 +55,9 @@
 #' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
 #' @references Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 #' Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
-#' @seealso \code{\link{glm}}, \code{\link{family.elliptical}}, \code{\link{elliptical.diag}}
-#' @keywords linear models
-#' @keywords elliptical
+#' @seealso \code{\link{glm}}, \code{\link{family.elliptical}}, \code{\link{summary.elliptical}}
+#' @keywords Elliptical models
+#' @keywords Linear regression models
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y
@@ -61,13 +69,13 @@
 #' ,data=luz)
 #' elliptical.fitLII <- elliptical(y ~ x1+x2+x3, family = LogisII()
 #' ,data=luz)
+#' @rdname elliptical
 #' @export
-
 
 elliptical <- function (formula = formula(data), family = Normal, data = sys.parent(), dispersion = NULL, 
                        weights, subset, na.action = "na.fail", method = "elliptical.fit", 
                        control = glm.control(epsilon = 1e-04, maxit = 100, trace = F), 
-                       model = F, x = F, y = T, contrasts = NULL, offset,...) 
+                       model = F, x = F, y = T, contrasts = NULL, offset, ...) 
 {
   call <- match.call()
   dist <- as.character(call$family)[1]
@@ -177,10 +185,10 @@ elliptical <- function (formula = formula(data), family = Normal, data = sys.par
     fit$R.assign <- pasgn
     fit$x.assign <- asgn
   }
-  fit <- c(fit, list(assign = asgn, df.residuals = df.residuals, 
+  fit <- c(fit, list(assign = asgn, df.residuals = df.residuals,  
                      family = family, user.def = user.def, formula = as.vector(attr(Terms, 
-                     "formula")), terms = Terms, contrasts = attr(X, 
-                     "contrasts"), control = control, call = call))
+                     "formula")), terms = Terms, contrasts = attr(X, "contrasts"), 
+                     control = control, call = call))
   if (y) 
     fit$y <- if (exists("Y.org", frame = sys.nframe())) 
       Y.org
@@ -325,38 +333,41 @@ elliptical.fit <- function (X, Y, offset, family, dispersion,
   fit <- list(coefficients = coefs, dispersion = dispersion, 
               fixed = !is.null.disp, residuals = residuals, fitted.values = fitted, 
               loglik = loglik, Wg = family$g1(residuals, df = family$df, 
-                                              r = family$r, s = family$s, alpha = family$alpha, 
-                                              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                              k = family$k), Wgder = family$g5(residuals, df = family$df, 
-                                                                               r = family$r, s = family$s, alpha = family$alpha, 
-                                                                               mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                               k = family$k), v = -2 * family$g1(residuals, df = family$df, 
-                                                                                                                 r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                                                 mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                                                 k = family$k), rank = rank, R = as.matrix(R), iter = iter - 
-                1, scale = 4 * family$g2(residuals, df = family$df, 
-                                         r = family$r, s = family$s, alpha = family$alpha, 
-                                         mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                         k = family$k), scaledispersion = -1 + 4 * family$g3(args, 
-                                                                                             df = family$df, r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                             mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                             k = family$k), scalevariance = family$g4(args, df = family$df, 
-                                                                                                                                      r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                                                                      mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                                                                      k = family$k), df = if (charmatch(family$family, 
-                                                                                                                                                                        "Student", F)) family$df, s = if (charmatch(family$family, 
-                                                                                                                                                                                                                    "Gstudent", F)) family$s, r = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                "Gstudent", F)) family$r, alpha = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                "Glogis", F)) family$alpha, mp = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                               "Glogis", F)) family$m, epsi = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                                                                            "Cnormal", F)) family$epsi, sigmap = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                               "Cnormal", F)) family$sigmap, k = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               "Powerexp", F)) family$k, Xmodel = matrix(Xd[, (1:rank)], 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         nrow(Xd), rank))
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), Wgder = family$g5(residuals, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), v = -2 * family$g1(residuals, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), rank = rank, R = as.matrix(R), iter = iter - 
+              1, scale = 4 * family$g2(residuals, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), scaledispersion = -1 + 4 * family$g3(args, 
+              df = family$df, r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), scalevariance = family$g4(args, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), df = if (charmatch(family$family, 
+              "Student", F)) family$df, s = if (charmatch(family$family, 
+              "Gstudent", F)) family$s, r = if (charmatch(family$family, 
+              "Gstudent", F)) family$r, alpha = if (charmatch(family$family, 
+              "Glogis", F)) family$alpha, mp = if (charmatch(family$family, 
+              "Glogis", F)) family$m, epsi = if (charmatch(family$family, 
+              "Cnormal", F)) family$epsi, sigmap = if (charmatch(family$family, 
+              "Cnormal", F)) family$sigmap, k = if (charmatch(family$family, 
+              "Powerexp", F)) family$k, Xmodel = matrix(Xd[, (1:rank)], 
+              nrow(Xd), rank))
   fit
 }
 
-
+#' @rdname elliptical
+#' @method print elliptical
+#' @noRd
+#' @export
 print.elliptical <- function (x, digits = 6,...) 
 {
   if (!is.null(cl <- x$call)) {
@@ -388,5 +399,6 @@ print.elliptical <- function (x, digits = 6,...)
   cat("\nDegrees of Freedom:", nobs, "Total;", rdf, "Residual\n")
   cat("-2*Log-Likelihood", format(-2 * x$loglik, digits = digits), 
       "\n")
+  cat("AIC:", (2*rank - 2*x$loglik), " AICc:", (2*rank - 2*x$loglik + 2*(rank)*(rank+1)/(nobs-rank-1)), " BIC:", (log(nobs)*rank - 2*x$loglik), "\n")
   invisible(x)
 }

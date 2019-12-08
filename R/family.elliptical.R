@@ -1,22 +1,32 @@
 #' @title Family Objects for Elliptical Models
 #' @method family elliptical
-#' @description Family objects provide a convenient way to specify the details of the models used by functions such as \code{elliptical}. See the documentation for \code{elliptical} or \code{egwr} for the details on how such model fitting takes place.
-#' @param object fit object for elliptical regression model.
+#' @name   family.elliptical
+#' @aliases Cauchy
+#' @aliases Cnormal
+#' @aliases Gstudent
+#' @aliases Glogis
+#' @aliases Normal
+#' @aliases Powerexp
+#' @aliases Student
+#' @aliases LogisI
+#' @aliases LogisII
+#' @description Family object provide an specify the details of the model used by functions such as \code{elliptical} and \code{gwer}. See the documentation for \code{elliptical} or \code{gwer} for more details.
+#' @param object an object with the result of the fitted elliptical regression model.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
-#' @return An object of class "family" (which has a concise print method). This is a list with elements:
+#' @return An object of class \dQuote{family} specifying a list with the follows elements:
 #' \item{family}{character: the family name.}
 #' \item{g0, g1, g2, g3, g4, g5}{derived fuctions associated with the distribution family defined.}
 #' \item{df}{degree of freedom for t-student distribution.}
 #' \item{s, r}{shape parameters for generalized t-student distribution.}
 #' \item{alpha}{shape parameter for contaminated normal and generalized logistic distributions.}  
 #' \item{mp}{shape parameter for generalized logistic distribution.}
-#' \item{epsi}{dispersion parameter for contaminated normal distribution.}
-#' \item{sigmap}{dispersion parameter for contaminated normal distribution.}
+#' \item{epsi,sigmap}{dispersion parameters for contaminated normal distribution.}
 #' \item{k}{shape parameter for power exponential distribution.}
 #' @references Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 #' Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 #' @seealso \code{\link{elliptical}}, \code{\link{gwer}}
-#' @keywords elliptical distributions
+#' @keywords Elliptical distributions
+#' @keywords Elliptical models
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y
@@ -27,6 +37,7 @@
 #' elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Normal()
 #' ,data=luz)
 #' family(elliptical.fitt)
+#' @rdname family.elliptical
 #' @export
 
 family.elliptical<- function (object,...) 
@@ -37,7 +48,11 @@ family.elliptical<- function (object,...)
                                "()")))
 }
 
-print.family.elliptical <- function (x) 
+#' @rdname family.elliptical
+#' @method print family.elliptical
+#' @noRd
+#' @export
+print.family.elliptical <- function (x, ...) 
 {
   cat("\n", x$family, "family\n")
   cat("\n density  : ", as.character(as.list(x[["g0"]])), 
@@ -181,13 +196,6 @@ make.family.elliptical <- function (name, arg)
                                                               "family"))
 }
 
-
-
-
-
-
-
-
 # Logistic Type I #
 dlogisI <- function (x, mean = 0, sd = 1) 
 {
@@ -315,4 +323,115 @@ rcnormal <- function(n, mean = 0, sd1 = 1, sd2, prob)
   sd <- sample(c(sd1,sd2), n, replace=T, prob=c(1-prob,prob))
   rnorm(n, mean, sd)
 }
+
+
+
+
+
+#' @rdname family.elliptical
+#' @export
+
+Normal <- function () 
+{
+  make.family.elliptical("Normal")
+}
+
+
+
+#' @rdname family.elliptical
+#' @export
+
+Cauchy <- function () 
+{
+  make.family.elliptical("Cauchy")
+}
+
+
+
+#' @rdname family.elliptical
+#' @export
+
+LogisI <- function () 
+{
+  make.family.elliptical("LogisI")
+}
+
+
+
+#' @rdname family.elliptical
+#' @export
+
+LogisII <- function () 
+{
+  make.family.elliptical("LogisII")
+}
+
+
+
+#' @rdname family.elliptical
+#' @param df degrees of freedom.
+#' @export
+
+Student <- function (df = stop("no df argument")) 
+{
+  if (df < 0) 
+    stop(paste("allowed values for degrees of freedom positive"))
+  make.family.elliptical("Student", arg = df)
+}
+
+
+
+#' @rdname family.elliptical
+#' @param k shape parameter.
+#' @export
+
+
+Powerexp <- function (k = stop("no k argument")) 
+{
+  if (abs(k) > 1) 
+    stop(paste("k must be (-1,1)"))
+  make.family.elliptical("Powerexp", arg = k)
+}
+
+
+
+#' @rdname family.elliptical
+#' @param parma parameter vector (alpha, m).
+#' @export
+
+Glogis <- function (parma = stop("no alpha=alpha(m) or m argument")) 
+{
+  if ((parma[1] <= 0) || (parma[2] <= 0)) 
+    stop(paste("alpha=alpha(m) and m must be positive"))
+  make.family.elliptical("Glogis", arg = list(alpha = parma[1], 
+                                              mp = parma[2]))
+}
+
+#' @rdname family.elliptical
+#' @param parm parameter vector (s, r) for this distribuition.
+#' @export
+
+Gstudent <- function (parm = stop("no s or r argument")) 
+{
+  if ((parm[1] <= 0) || (parm[2] <= 0)) 
+    stop(paste("s and r must be positive"))
+  make.family.elliptical("Gstudent", arg = list(s = parm[1], 
+                                                r = parm[2]))
+}
+
+
+#' @rdname family.elliptical
+#' @param parmt parameters vector (epsi, sigma).
+#' @export
+
+Cnormal <- function (parmt = stop("no epsi or sigma argument")) 
+{
+  stop(paste("not implement yet"))
+  if ((parmt[1] < 0) || (parmt[1] > 1) || (parmt[2] <= 0)) 
+    stop(paste("0<=epsilon<=1 and sigma must be positive"))
+  make.family.elliptical("Cnormal", arg = list(epsi = parmt[1], 
+                                               sigmap = parmt[2]))
+}
+
+
 

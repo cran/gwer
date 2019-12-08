@@ -2,6 +2,7 @@
 % Please edit documentation in R/elliptical.R
 \name{elliptical}
 \alias{elliptical}
+\alias{print.elliptical}
 \title{Elliptical Regression Models}
 \usage{
 elliptical(formula = formula(data), family = Normal,
@@ -19,21 +20,21 @@ elliptical(formula = formula(data), family = Normal,
 
 \item{dispersion}{an optional fixed value for dispersion parameter.}
 
-\item{weights}{an optional vector of weights to be used in the fitting process.}
+\item{weights}{an optional numeric vector of weights to be used in the fitting process.}
 
-\item{subset}{an optional vector specifying a subset of observations to be used in the fitting process.}
+\item{subset}{an optional numeric vector specifying a subset of observations to be used in the fitting process.}
 
 \item{na.action}{a function which indicates what should happen when the data contain NAs (see \code{glm}).}
 
 \item{method}{optimization method used to estimate the parameters. The default method "elliptical.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.}
 
-\item{control}{a list of parameters for controlling the fitting process. For \code{egwr.fit} this is passed to \code{glm.control}.}
+\item{control}{a list of parameters for controlling the fitting process. For \code{elliptical} this is passed by \code{glm.control}.}
 
-\item{model}{a logical value indicating whether model frame should be included as a component of the returned value.}
+\item{model}{a logical value indicating whether model frame should be included as a component of the return.}
 
-\item{x}{a logical value indicating whether the response vector used in the fitting process should be returned as components of the returned value.}
+\item{x}{a logical value indicating whether the response vector used in the fitting process should be returned as components of the return.}
 
-\item{y}{a logical value indicating whether model matrix used in the fitting process should be returned as components of the returned value.}
+\item{y}{a logical value indicating whether model matrix used in the fitting process should be returned as components of the return.}
 
 \item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.}
 
@@ -42,34 +43,40 @@ elliptical(formula = formula(data), family = Normal,
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
 \value{
-A list of class \dQuote{elliptical}:   
-\item{coefficients}{coefficients of location of the model fit.}
-\item{dispersion}{coefficients of dispersion of the model fit.}
-\item{residuals}{the standardized residuals, that is the residuals in the final iteration of the optimization process.}
+returns an object of class \dQuote{elliptical}, a list with follow components: 
+\item{coefficients}{coefficients of location parameters.}
+\item{dispersion}{coefficient of dispersion parameter.}
+\item{residuals}{standardized residuals.}
 \item{fitted.values}{the fitted mean values.}
-\item{loglik}{the likelihood logarithm value of the adjusted model's.}  
-\item{Wg}{the values of the function W_g(u).}
-\item{Wgder}{the values of the function W^'_g(u).}
-\item{v}{the values of the function V(u).}
-\item{rank}{the numeric rank of the fitted linear model.}
-\item{inter}{the number of iterations of optimization process.}
-\item{scale}{the values of the 4d_g for the specified distribution.}
-\item{scaledispersion}{the values of the 4f_g for the specified distribution.}
-\item{scalevariance}{the values of the scale variance for the specified distribution.}
-\item{df}{the degrees of freedom for fitted model.}
-\item{Xmodel}{is the model matrix.}
+\item{loglik}{the likelihood logarithm value for the fitted model.}  
+\item{Wg}{values of the function \code{W_g(u)}.}
+\item{Wgder}{values for the function \code{W^{(1)}_g(u)}.}
+\item{v}{values for the function \code{V(u)}.}
+\item{rank}{the numeric rank for the fitted model.}
+\item{R}{the matrix of correlation for the estimated parameters.}
+\item{inter}{number of iterations of optimization process.}
+\item{scale}{values of the \code{4d_g} for the specified distribution.}
+\item{scaledispersion}{values of the \code{4f_g} for the specified distribution.}
+\item{scalevariance}{values of the scale variance for the specified distribution.}
+\item{df}{degree of freedom for t-student distribution.}
+\item{s, r}{shape parameters for generalized t-student distribution.}
+\item{alpha}{shape parameter for contaminated normal and generalized logistic distributions.}  
+\item{mp}{shape parameter for generalized logistic distribution.}
+\item{epsi,sigmap}{dispersion parameters for contaminated normal distribution.}
+\item{k}{shape parameter for power exponential distribution.}
+\item{Xmodel}{the model matrix.}
 \item{weights}{the working weights, that is the weights in the final iteration of optimization process}
 \item{df.residuals}{the residual degrees of freedom.}
 \item{family}{the \code{family} object used.}
-\item{formula}{the formula supplied.}
+\item{formula}{the \code{formula} supplied.}
 \item{terms}{the \code{terms} object used.}
 \item{contrasts}{(where relevant) the contrasts used.}
-\item{control}{the value of the\code{control} argument used.}
+\item{control}{the value of the \code{control} argument used.}
 \item{call}{the matched call.}
 \item{y}{the response variable used.}
 }
 \description{
-The function implements linear elliptical regression models, specified by giving a symbolic description of the systematic and stochastic components.
+The function implements linear elliptical regression models. This models is specified giving a symbolic description of the systematic and stochastic components.
 }
 \examples{
 data(luzdat)
@@ -92,8 +99,9 @@ Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 }
 \seealso{
-\code{\link{glm}}, \code{\link{family.elliptical}}, \code{\link{elliptical.diag}}
+\code{\link{glm}}, \code{\link{family.elliptical}}, \code{\link{summary.elliptical}}
 }
-\keyword{elliptical}
-\keyword{linear}
+\keyword{Elliptical}
+\keyword{Linear}
 \keyword{models}
+\keyword{regression}

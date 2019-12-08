@@ -1,16 +1,17 @@
 #' @title Simulated Envelope of Residuals
 #' @import glogis
-#' @description This function produces quantile-quantile plots with simulated envelope for response distribution in elliptical regression models.
-#' @param object fit object for elliptical regression model.
+#' @description This function produces quantile-quantile residuals plot with simulated envelope for the specified error distribution in elliptical regression models.
+#' @param object an object with the result of the fitted elliptical regression model.
 #' @param B number of monte carlo simulations.
 #' @param arg a numerical or vector representing the distribution parameters used.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
 #' @references Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
 #' symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
 #' \url{https://doi.org/10.1016/j.spl.2005.04.033}
-#' @seealso \code{\link{glm}}, \code{\link{elliptical}}, \code{\link{elliptical.diag}}
+#' @seealso \code{\link{glm}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
+#' @keywords residuals
 #' @keywords quantile-quantile plots
-#' @keywords elliptical
+#' @keywords elliptical models
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y

@@ -1,30 +1,32 @@
 #' @title Summarizing Elliptical Model Fits.
 #' @method summary elliptical
-#' @description These functions are all methods for class \code{glm} or \code{summary.glm} objects.
-#' @param object fit object for elliptical regression model.
-#' @param correlation if TRUE, the correlation matrix of the estimated parameters is returned and printed.
+#' @name summary.elliptical
+#' @aliases print.summary.elliptical
+#' @description This function produce result summary of the result of the fitted elliptical regression model.
+#' @param object an object with the result of the fitted elliptical regression model.
+#' @param correlation a logical value to return the correlation for the estimated parameters. If \code{FALSE} (by default) not return the correlation matrix.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
-#' @return returns an object of class \code{summary.elliptical}, a list with components: 
-#' \item{coefficients}{the matrix of coefficients, standard errors and significance values for hypothesis test.}
+#' @return returns an object of class \dQuote{summary.elliptical}, a list with follow components: 
+#' \item{coefficients}{the matrix of coefficients, standard errors and significance values for parameters hypothesis test.}
 #' \item{dispersion}{either the supplied argument or the estimated dispersion with standard error.}
-#' \item{residuals}{residuals from \code{object}.}
+#' \item{residuals}{the residuals from \code{object}.}
 #' \item{cov.unscaled}{the unscaled (dispersion = 1) estimated covariance matrix of the estimated coefficients.}
-#' \item{corrrelation}{the likelihood logarithm value of the adjusted model's.}  
+#' \item{corrrelation}{the matrix of correlation for the estimated parameters.}  
 #' \item{family}{family from \code{object}.}
-#' \item{loglik}{logarithmic likelihood from \code{object}.}
+#' \item{loglik}{the likelihood logarithm value from \code{object}.}
 #' \item{terms}{the \code{terms} object used.}
-#' \item{df}{degrees of fredom  from \code{object}.}
-#' \item{inter}{the number of iterations of optimization process from \code{object}.}
+#' \item{df}{degrees of fredom from \code{object}.}
+#' \item{inter}{number of iterations of optimization process.}
 #' \item{nas}{a logical vector indicating if there is \code{na} in estimation of coefficients.}
 #' \item{call}{the matched call from \code{object}.}
-#' \item{scale}{the values of the 4d_g for the specified distribution from \code{object}.}
-#' \item{scaledispersion}{the values of the 4f_g for the specified distribution from \code{object}.}
+#' \item{scale}{values of the \code{4d_g} for the specified distribution from \code{object}.}
+#' \item{scaledispersion}{values of the \code{4f_g} for the specified distribution from \code{object}.}
 #' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 #' symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
 #' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
-#' @seealso \code{\link{glm}}, \code{\link{elliptical}}, \code{\link{elliptical.diag}}
-#' @keywords elliptical
-#' @keywords summary
+#' @seealso \code{\link{glm}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
+#' @keywords Elliptical models
+#' @keywords Linear regression models
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y
@@ -35,6 +37,7 @@
 #' elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Student(df=5)
 #' ,data=luz)
 #' summary(elliptical.fitt)
+#' @rdname summary.elliptical
 #' @export
 
 
@@ -95,8 +98,11 @@ summary.elliptical<-function(object, correlation = TRUE,...)
   summary
 }
 
-
-summary.elliptical.print <- function (x, digits = 6, quote = T, prefix = "") 
+#' @rdname summary.elliptical
+#' @method print summary.elliptical
+#' @noRd
+#' @export
+print.summary.elliptical <- function (x, digits = 6, quote = T, ...) 
 {
   nas <- x$nas
   p <- sum(!nas)

@@ -2,12 +2,13 @@
 % Please edit documentation in R/gwer.sel.R
 \name{gwer.sel}
 \alias{gwer.sel}
-\title{Optimization of Bandwidth for Geographically Weighted Elliptical Regression}
+\title{Optimization of Bandwidth for Geographically Weighted Elliptical Regression Model}
 \usage{
 gwer.sel(formula, data = list(), coords, adapt = FALSE,
-  gweight = gwr.Gauss, method = "cv", verbose = TRUE,
-  longlat = NULL, family, RMSE = FALSE, weights,
-  tol = .Machine$double.eps^0.25, show.error.messages = FALSE, ...)
+  gweight = gwr.Gauss, weights, method = "cv", verbose = TRUE,
+  longlat = NULL, family = Normal(), RMSE = FALSE,
+  tol = .Machine$double.eps^0.25, show.error.messages = FALSE,
+  maxit = 100)
 }
 \arguments{
 \item{formula}{regression model formula as in \code{glm}.}
@@ -18,31 +19,31 @@ gwer.sel(formula, data = list(), coords, adapt = FALSE,
 
 \item{adapt}{defines the type of bandwidth used. Either TRUE: find the proportion between 0 and 1 of observations to include in weighting scheme (k-nearest neighbours) or FALSE: find global bandwidth.}
 
-\item{gweight}{geographical weighting function, at present \code{gwr.Gauss()} default, or \code{gwr.bisquare()}.}
+\item{gweight}{geographical weighting function, at present \code{gwr.Gauss()} default.}
 
-\item{method}{default "cv" for drop-1 cross-validation, "aic" for AIC optimisation (depends on assumptions about AIC degrees of freedom) or "sv" for spatial validation.}
+\item{weights}{an optional numeric vector of weights to be used in the fitting process, beware of scaling issues. Only used with the cross-validation method, probably unsafe.}
 
-\item{verbose}{if TRUE (default), reports the progress of search for bandwidth.}
+\item{method}{type of the method used to the compute of residuals. Is \code{cv} for drop-1 cross-validation (default), \code{aic} for AIC optimisation (depends on assumptions about AIC degrees of freedom) or \code{sv} for spatial validation.}
+
+\item{verbose}{if TRUE (default) reports the progress of search for bandwidth.}
 
 \item{longlat}{TRUE if point coordinates are longitude-latitude decimal degrees, in which case distances are measured in kilometers; if x is a SpatialPoints object, the value is taken from the object itself.}
 
-\item{family}{a description of the error distribution to be used in the model (see \code{elliptical.family} for details of family functions).}
+\item{family}{a description of the error distribution to be used in the model (see \code{family.elliptical} for more details of family functions).}
 
 \item{RMSE}{default FALSE to correspond with CV scores in newer references (sum of squared CV errors), if TRUE the previous behaviour of scoring by LOO CV RMSE.}
-
-\item{weights}{case weights used as in weighted least squares, beware of scaling issues. Only used with the cross-validation method, probably unsafe.}
 
 \item{tol}{the desired accuracy to be passed to \code{optimize}.}
 
 \item{show.error.messages}{default FALSE. may be set to TRUE to see error messages if \code{gwer.sel} returns without a value.}
 
-\item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
+\item{maxit}{maximum number of iterations in model fit}
 }
 \value{
 returns the bandwidth optimization value.
 }
 \description{
-The function finds a bandwidth for a given geographically weighted elliptical regression by optimzing a selected function. For cross-validation, this scores the root mean square prediction error for the geographically weighted elliptical regressions, choosing the bandwidth minimizing this quantity.
+The function compute the optimal bandwidth for a given geographically weighted elliptical regression using three differents methods: cross-validation, AIC and spatial validation. This optimal bandwidth optimzing the selected function.
 }
 \examples{
 data(columbus, package="spData")
@@ -51,7 +52,7 @@ gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Normal(),
 \donttest{
 data(columbus, package="spData")
 gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Student(df=4),
-                 coords=cbind(columbus$X, columbus$Y))
+                 coords=cbind(columbus$X, columbus$Y), method = "aic")
 }
 }
 \references{
@@ -59,11 +60,20 @@ Brunsdon, C., Fotheringham, A. S. and Charlton, M. E. (1996).
 Geographically weighted regression: a method for exploring spatial nonstationarity.
 Geographical analysis, 28(4), 281-298. \url{https://doi.org/10.1111/j.1538-4632.1996.tb00936.x}
 
+Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
+symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
+\url{https://doi.org/10.1016/j.spl.2007.01.012}
+
 Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 }
 \seealso{
 \code{\link{gwer}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
 }
-\keyword{elliptical}
-\keyword{spatial}
+\keyword{Bandwidth}
+\keyword{Elliptical}
+\keyword{Geographically}
+\keyword{model}
+\keyword{optimization}
+\keyword{regression}
+\keyword{weighted}

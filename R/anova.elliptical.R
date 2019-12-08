@@ -1,16 +1,17 @@
 #' @title Analysis of Deviance for Elliptical Model Fits
 #' @method anova elliptical
-#' @description Compute an analysis of deviance table for one or more elliptical model fits.
-#' @param object fit object for elliptical regression model.
-#' @param dispersion the dispersion parameter for the fitting family, by default obtained from object.
-#' @param test a character string representing that hypothesis test should be considered.
-#' @param ... arguments to be used to form the default control argument if it is not supplied directly.
-#' @return An object of class \code{anova} inheriting from class \code{data.frame}
+#' @description Compute an analysis of deviance table for the fitted elliptical regression model.
+#' @param object an object with the result of the fitted elliptical regression model.
+#' @param dispersion the dispersion parameter for the fitting family. If is \code{NULL} (by default) is obtained from object.
+#' @param test a character string containing the hypothesis test considered. By default is used the chi-square test.
+#' @param ... additional objects of the same type.
+#' @return Return an object of class \dQuote{anova}. This object contain the analysis of deviance.
 #' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 #' symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
 #' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
-#' @seealso \code{\link{elliptical}}
-#' @keywords elliptical
+#' @seealso \code{\link{elliptical}}, \code{\link{summary.elliptical}}, \code{\link{family.elliptical}}
+#' @keywords Elliptical models
+#' @keywords Hypothesis tests
 #' @keywords ANOVA
 #' @examples
 #' data(luzdat)
@@ -21,10 +22,10 @@
 #' luz <- data.frame(y,x1,x2,x3)
 #' elliptical.fitt <- elliptical(y ~ x1+x2+x3, family = Student(df=5),
 #' data=luz)
-#' anova(elliptical.fitt)
+#' anova(elliptical.fitt, test = "Chisq")
 #' @export
  
-anova.elliptical <- function(object, dispersion = NULL, test = c("Chisq"),...) 
+anova.elliptical <- function(object, ..., dispersion = NULL, test = c("Chisq")) 
 {
   test <- match.arg(test)
   margs <- function(...) nargs()
@@ -81,7 +82,7 @@ anova.elliptical <- function(object, dispersion = NULL, test = c("Chisq"),...)
 }
 
 
-anova.ellipticallist <- function (object, test = c("Chisq")) 
+anova.ellipticallist <- function (object, ...,test = c("Chisq")) 
 {
   diff.term <- function(term.labels, i) {
     t1 <- term.labels[[1]]
@@ -143,7 +144,6 @@ anova.ellipticallist <- function (object, test = c("Chisq"))
     aod <- stat.anova(aod, test, 1, dfres[o[1]], n)
   }
   else aod
-  #  structure(aod, heading = c(heading, topnote), class = c("anova",
   structure(aod, heading = heading, class = c("anova",
                                               "data.frame"))
 }

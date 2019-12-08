@@ -1,5 +1,5 @@
 #' @docType data
-#' @title Brightness of Snacks
+#' @title Brightness of Snacks Dataset
 #' @description This dataset its a part of a study development by the nutritional 
 #' department of USP (S\~{a}o Paulo University) such that is compared five new type 
 #' composition of the snack with low saturated fat and fatty acids.

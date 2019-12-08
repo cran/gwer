@@ -6,79 +6,96 @@
 #' @import sp
 #' @import spData
 #' @import maptools
-#' @description The function implements geographically weighted elliptical regression to explore the non-stationarity for certain global bandwidth and chosen weighting scheme.
+#' @name gwer
+#' @aliases print.gwer
+#' @description The function fit geographically weighted elliptical regression  model to explore the non-stationarity for a certain bandwidth and  weighting function.
 #' @param formula regression model formula as in \code{glm}.
 #' @param coords matrix of coordinates of points representing the spatial positions of the observations.
-#' @param bandwidth value of the selected bandwidth (see \code{gwer.sel} for bandwidth optimization).
+#' @param bandwidth value of the selected bandwidth used in the weighting function (see \code{gwer.sel} for bandwidth optimization).
 #' @param gweight geographical weighting function, at present \code{gwr.Gauss()} is default.
 #' @param adapt defines the type of bandwidth used. either NULL (default) or a proportion between 0 and 1 of observations to include in weighting scheme (k-nearest neighbours).
+#' @param hatmatrix if TRUE, return the hatmatrix as a component of the result, ignored if fit.points given
 #' @param spdisp if TRUE dispersion parameter varies geographically.
 #' @param family a description of the error distribution to be used in the model (see \code{elliptical.family} for details of family functions).
 #' @param data model data frame, or may be a SpatialPointsDataFrame or SpatialPolygonsDataFrame as defined in package \pkg{sp}.
 #' @param dispersion an optional fixed value for dispersion parameter.
-#' @param weights an optional vector of weights to be used in the fitting process for local models.
-#' @param subset an optional vector specifying a subset of observations to be used in the fitting process.
+#' @param weights an optional numeric vector of weights to be used in the fitting process.
+#' @param subset an optional numeric vector specifying a subset of observations to be used in the fitting process.
 #' @param fit.points an object containing the coordinates of fit points, often an object from package \pkg{sp}. If missing, the coordinates given through the data argument object, or the coords argument are used.
 #' @param na.action a function which indicates what should happen when the data contain NAs (see \code{glm}).
 #' @param method the method to be used in fitting local models. The default method "gwer.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.
 #' @param longlat TRUE if point coordinates are longitude-latitude decimal degrees, in which case distances are measured in kilometers. If x is a SpatialPoints object, the value is taken from the object itself.
-#' @param control a list of parameters for controlling the fitting process. For \code{gwer.fit} this is passed to \code{glm.control}.
-#' @param model a logical value indicating whether model frame should be included as a component of the returned value.
-#' @param x a logical value indicating whether the response vector used in the fitting process should be returned as components of the returned value.
-#' @param y a logical value indicating whether model matrix used in the fitting process should be returned as components of the returned value.
+#' @param control a list of parameters for controlling the fitting process. For \code{elliptical} this is passed by \code{glm.control}.
+#' @param model a logical value indicating whether model frame should be included as a component of the return.
+#' @param x a logical value indicating whether the response vector used in the fitting process should be returned as components of the return.
+#' @param y a logical value indicating whether model matrix used in the fitting process should be returned as components of the return.
 #' @param contrasts an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.
 #' @param parplot if TRUE the parameters boxplots are plotted.
 #' @param offset this can be used to specify an a priori known component to be included in the linear predictor during fitting as in \code{glm}.
-#' @param type character that indicates the type of residuals should consider as return.
-#' @param gwr.diag if TRUE is calculated the diagnostic measures of the model and provided in return.
+#' @param type a character string that indicates the type of residuals should consider as return.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
-#' @return A list of class \dQuote{gwer}:   
+#' @return returns an object of class \dQuote{gwer}, a list with follow components:   
 #' \item{SDF}{a SpatialPointsDataFrame (may be gridded) or SpatialPolygonsDataFrame object (see package \pkg{sp}) with fit.points, weights, GWR coefficient estimates, dispersion and the residuals of \code{type} in its \code{data} slot.}
-#' \item{coef}{regression parameters matrix of the fitted model.}
-#' \item{se}{standard errors matrix for the parameters of the fitted model.}
-#' \item{pvalue}{p-value matrix for the significance tests of parameters of the fitted model.}
-#' \item{lhat}{hat matrix of the geographically weighted elliptical model.}
-#' \item{lm}{elliptical regression on the same model formula.}  
-#' \item{Weights}{matrix for geographical weighting.}
-#' \item{results}{a list of results values for fitted geographically weighted elliptical model.}
+#' \item{coef}{the matrices of coefficients, standard errors and significance values for parameters hypothesis test.}
+#' \item{dispersion}{either the supplied argument or the estimated dispersion with standard error.}
+#' \item{hat}{hat matrix of the geographically weighted elliptical model.}
+#' \item{lm}{elliptical global regression on the same model formula.}  
+#' \item{results}{a list of results values for fitted geographically weighted elliptical model.}  
+#' \item{bandwidth}{the bandwidth used in geographical weighting function.}
 #' \item{fitted}{the fitted mean values of the geographically weighted elliptical model.}
-#' \item{diag}{a list of diagnostic matrices ('leverage', 'global influence' and 'local influence'), see \code{elliptical.diag} for more details.}
-#' \item{residuals}{a list of all residuals type ('ordinal', 'studentized' and 'deviance').}
+#' \item{hatmatrix}{a logical value indicating if hatmatrix was considered}
+#' \item{gweights}{a matrix with the geographical weighting for all local elliptical models.}
+#' \item{family}{the \code{family} object used.}
+#' \item{flm}{a matrix with the fitted values for all local elliptical models.}
+#' \item{adapt}{the \code{adapt} object used.}
+#' \item{gweight}{the \code{gweights} object used.}
+#' \item{spdisp}{the \code{spdisp} object used.}
 #' \item{this.call}{the function call used.}
+#' \item{fp.given}{the \code{fp.given} object used.}
+#' \item{longlat}{the \code{longlat} object used.}
+#' \item{type}{the \code{type} residuals for the object used.}
 #' @references Brunsdon, C., Fotheringham, A. S. and Charlton, M. E. (1996). 
 #' Geographically weighted regression: a method for exploring spatial nonstationarity.
 #' Geographical analysis, 28(4), 281-298. \url{https://doi.org/10.1111/j.1538-4632.1996.tb00936.x}
+#' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
+#' symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
+#' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
 #' @references Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 #' Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 #' @seealso \code{\link{gwer.sel}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
-#' @keywords spatial
-#' @keywords elliptical model
+#' @keywords Geographically weighted regression
+#' @keywords Bandwidth optimization
+#' @keywords Elliptical model
 #' @examples
 #' data(columbus, package="spData")
 #' fit.lm <- lm(CRIME ~ INC, data=columbus)
 #' summary(fit.lm)
 #' gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Normal(),
+#'                  coords=cbind(columbus$X, columbus$Y), method = 'aic')
+#' gwer.fit <- gwer(CRIME ~ INC, family = Normal(), bandwidth = gwer.bw, hatmatrix = TRUE, 
+#'                  spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
 #'                  coords=cbind(columbus$X, columbus$Y))
-#' fit.gwer <- gwer(CRIME ~ INC, family = Normal(), bandwidth = gwer.bw, 
-#'                  parplot = TRUE, data=columbus, method = "gwer.fit",
-#'                  coords=cbind(columbus$X, columbus$Y))
+#' print(gwer.fit) 
 #' \donttest{
 #' data(columbus, package="spData")
-#' fit.lm <- lm(CRIME ~ INC, data=columbus)
-#' summary(fit.lm)
+#' fit.elliptical <- elliptical(CRIME ~ INC, family = Student(df=4), data=columbus)
+#' summary(fit.elliptical)
 #' gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Student(df=4),
 #'                  coords=cbind(columbus$X, columbus$Y), method = 'aic')
-#' gwer.fitt <- gwer(CRIME ~ INC, family = Student(df=4), bandwidth = gwer.bw, 
-#'                  parplot = TRUE, data=columbus, method = "gwer.fit",
+#' gwer.fitt <- gwer(CRIME ~ INC, family = Student(df=4), bandwidth = gwer.bw, hatmatrix = TRUE,
+#'                  spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
 #'                  coords=cbind(columbus$X, columbus$Y))
+#' print(gwer.fitt)  
 #' }
+#' @rdname gwer
 #' @export
 
-gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL, spdisp = F,
-          family = Normal, data = sys.parent(), dispersion = NULL, weights, subset,
-          fit.points, na.action = "na.fail", method = "gwer.fit", longlat = NULL,
-          control = glm.control(epsilon = 1e-04, maxit = 100, trace = F), model = F,
-          x = F, y = T, contrasts = NULL, parplot = F, offset, type='pearson', gwr.diag = F,...) 
+gwer <- function (formula, data = sys.parent(), coords, bandwidth, gweight = gwr.Gauss, 
+                  adapt = NULL, hatmatrix = FALSE, fit.points, family = Normal, longlat = NULL, 
+                  weights, dispersion = NULL, subset, na.action = "na.fail", method = "gwer.fit",
+                  control = glm.control(epsilon = 1e-04, maxit = 100, trace = F), model = FALSE,
+                  x = FALSE, y = TRUE, contrasts = NULL, offset, type='pearson', spdisp = FALSE,
+                  parplot = FALSE,...)
 {
   call <- match.call()
   this.call <- match.call()
@@ -131,24 +148,23 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
   }
   if (missing(data)) 
     data <- environment(formula)
-  #if (!is.null(gwr.diag) && gwr.diag != 'idex' && gwr.diag != 'mean') 
-  #  stop("diagnostic method not implemented (choose between 'idex' or 'mean')")
-  
+
   
   if (!charmatch(method, c("model.frame", "gwer.fit"), F)) 
     stop(paste("\n unimplemented method:", method))
-  m <- match.call(expand.dots = F)
-  m$family <- m$method <- m$control <- m$model <- m$dispersion <- m$x <- m$y <- m$bandwidth  <- m$gweight <- m$adapt <- m$longlat <-m$contrasts <- m$offset <- m$gwr.diag <- m$parplot <- m$... <- NULL
+  m <- match.call(expand.dots = FALSE)
+  m$family <- m$method <- m$control <- m$model <- m$dispersion <- m$x <- m$y <- m$bandwidth  <- m$gweight <- m$adapt <- m$longlat <-m$contrasts <- m$offset <- m$hatmatrix <- m$spdisp <- m$parplot <- m$... <- NULL
   m[[1]] <- as.name("model.frame")
   m <- eval(m, sys.parent())
+  dp.n <- length(model.extract(m, "response"))
   if (method == "model.frame") 
     return(m)
   {
-    if (!missing(family) && !charmatch(dist, c("Normal", 
-                                               "Cauchy", "Student", "Gstudent", "LogisI", "LogisII", 
+    if (!missing(family) && !charmatch(dist, c("Normal", "Cauchy", "Student", 
+                                               "Gstudent", "LogisI", "LogisII", 
                                                "Glogis", "Cnormal", "Powerexp"), F)) 
       cat(paste("\n work with user-defined family:", call$family, "\n"))
-    }
+  }
   if (!missing(dispersion) && is.numeric(dispersion) && !(dispersion > 0)) 
     stop("\n no negative values for dispersion parameter")
   Terms <- attr(m, "terms")
@@ -186,9 +202,6 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
       offset <- offset[wpos]
     }
   }
-
-  
-  
   
   
   method <- "gwer.fit"
@@ -198,7 +211,10 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
   fit <- elliptical.fitter(X = X, Y = Y,  offset = offset4fit, family = family, 
                            dispersion = dispersion, maxit = control$maxit, 
                            epsilon = control$epsilon, trace = control$trace, ...)
-  
+  if (!spdisp)
+    dispersiongwr <- fit$dispersion
+  if (hatmatrix) 
+    se.fit <- TRUE
   if (missing(fit.points)) {
     fp.given <- FALSE
     fit.points <- coords
@@ -221,7 +237,8 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
   rownames(fit.points) <- NULL
   if (is.null(colnames(fit.points))) 
     colnames(fit.points) <- c("x", "y")
-  p <- NCOL(x)
+
+  p <- NCOL(X)
 
   if (NROW(X) != NROW(coords)) 
     stop("Input data and coordinates have different dimensions")
@@ -241,11 +258,9 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
   
   if (any(bandwidth < 0)) 
     stop("Invalid bandwidth")
-  gwr.b <- matrix(nrow = nobs, ncol = ncol(X))
-  v_resids <- numeric(n)
-  v_fitteds <- numeric(n)
-  colnames(gwr.b) <- colnames(X)
-  
+
+  v_resids <- numeric(n) ; v_fitteds <- numeric(n)
+
   if (any(wzero)) {
     nas <- is.na(fit$coef)
     fitted[wpos] <- fit$fitted.values/w[wpos]
@@ -284,16 +299,25 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
     fit$x.assign <- asgn
   }
   
-  
-  lhat <- NA ; gWeights <- matrix(0,n,n) ; Vi <- matrix(0,n,n)
-  stderror <- matrix(0,n,p+1) ; zvalue <- matrix(0,n,p+1) ; pvalue <- matrix(0,n,p+1)
-  colnames(stderror) <- c(paste(colnames(X),rep(".se",p), sep = ""), "dispersion.se") ; colnames(zvalue) <- colnames(pvalue) <- c(colnames(X),"dispersion")
-  sum.w <- numeric(n) ; dispersiongwr <- numeric(n) ; Hat <- matrix(0,n,n)
-  residgwr <- numeric(n) ; resid.diagst <- resid.diagcd <- matrix(0,n,1)
-  if(!is.null(gwr.diag)){
-    GL <- GLbeta <- GLphi <- Lmaxr <- Cic <- Cih <- DGbeta <- DGphi <- hat <- matrix(0,n,n)
-    Cmaxc <- list() ; for(j in 1:p){Cmaxc[[j]] <- matrix(0,n,n)}
+  gweights <- matrix(0,n,n) ;  resid.ord <- matrix(0,n,1)  #; Vi <- matrix(0,n,n)
+  local.fitted <- matrix(0,n,n) ; sum.w <- numeric(n)  
+
+  if(spdisp){ 
+    dispersiongwr <- numeric(n) 
+    gwr.b <- matrix(nrow = nobs, ncol = ncol(X)+1)
+    stderror <- matrix(0,n,p+1) ; zvalue <- matrix(0,n,p) ; pvalue <- matrix(0,n,p)
+    colnames(stderror) <- c(paste(colnames(X),rep(".se",p), sep = ""), "dispersion.se")
+    colnames(gwr.b) <- c(colnames(X), "dispersion")
+  } else {
+    gwr.b <- matrix(nrow = nobs, ncol = ncol(X))
+    stderror <- matrix(0,n,p) ; zvalue <- matrix(0,n,p) ; pvalue <- matrix(0,n,p)
+    colnames(stderror) <- paste(colnames(X),rep(".se",p), sep = "")
+    colnames(gwr.b) <- c(colnames(X))    
   }
+  colnames(zvalue) <- colnames(pvalue) <- c(colnames(X)) 
+  
+  if (!fp.given && hatmatrix)
+    Hat <- matrix(0,n,n)
   
   for (i in 1:n) {
     dxs <- spDistsN1(coords, fit.points[i, ], longlat = longlat)
@@ -307,12 +331,13 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
                               maxit = control$maxit, epsilon = control$epsilon, 
                               trace = control$trace, ...)
     sum.w[i] <- sum(w.i)
-    gwr.b[i, ] <- coefficients(lm.i)
-    if (!fp.given) 
-      v_resids[i] <- residuals.elliptical(lm.i, type = type)[i]
-    else is.na(v_resids[i]) <- TRUE
-    
     v_fitteds[i] <- fitted.values(lm.i)[i]
+    if(spdisp){ 
+      dispersiongwr[i] <- lm.i$dispersion
+      gwr.b[i, ] <- c(coefficients(lm.i),dispersiongwr[i])
+    } else{
+      gwr.b[i, ] <- coefficients(lm.i)
+    }
     
     if (any(wzero)) {
       nas <- is.na(fit$coef)
@@ -324,7 +349,7 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
       lm.i$fitted.values <- fitted.i
       resid.i[wpos] <- lm.i$resid
       resid.i[wzero] <- (Y.org[wzero] - fitted.i[wzero])/sqrt(lm.i$dispersion)
-      lm.i$residuals <- resid.i
+      lm.i$residuals <- resid.i ; resid.ord <- lm.i$residuals
       q1.i[wpos] <- lm.i$q1
       q2.i[wpos] <- lm.i$q2
       q1.i[wzero] <- family$g1(resid[wzero], df = family$df, 
@@ -337,7 +362,7 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
     else lm.i$fitted.values <- lm.i$fitted.values/w
     lm.i$weights <- w
     lm.i$gweights <- w.i
-    gWeights[i,] <- lm.i$gweights
+    gweights[i,] <- lm.i$gweights
     names(lm.i$fitted.values) <- names(lm.i$residuals) <- names(lm.i$q1) <- names(lm.i$q2) <- NULL
     rank.i <- lm.i$rank
     df.r <- length(if (exists("X.org", frame = sys.nframe())) Y.org else Y) - 
@@ -353,9 +378,9 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
       lm.i$x.assign <- asgn.i
     }
     lm.i <- c(lm.i, list(assign = asgn, df.residuals = df.residuals, 
-                         family = family, user.def = user.def, formula = as.vector(attr(Terms, 
-                                                                                        "formula")), terms = Terms, contrasts = attr(X, 
-                                                                                                                                     "contrasts"), control = control, call = call))
+              family = family, user.def = user.def, formula = as.vector(attr(Terms, 
+              "formula")), terms = Terms, contrasts = attr(X, 
+              "contrasts"), control = control, call = call))
     
     if (y) 
       lm.i$y <- if (exists("Y.org", frame = sys.nframe())) 
@@ -370,33 +395,31 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
       lm.i$model <- m
     attr(lm.i, "class") <- c("elliptical", "glm", "lm")
     
-    
-    if(spdisp == TRUE)
-    	dispersiongwr[i] <- lm.i$dispersion
-    else
-    	dispersiongwr[i] <- fit$dispersion
-    
+    local.fitted[i,] <- lm.i$fitted.values
+    if (!fp.given) 
+      v_resids[i] <- residuals.gwer(lm.i, type = type)[i]
+    else is.na(v_resids[i]) <- TRUE
+
     
     R <- lm.i$R[(1:p), (1:p)]
     covun <- solve(qr(R))
     rowlen <- sqrt(diag(covun))
-    
-    stderror[i, ] <- c(rowlen[1:p] * sqrt(lm.i$dispersion/lm.i$scale), sqrt(4*lm.i$dispersion^2/(sum(lm.i$gweights)*lm.i$scaledispersion)))
-    zvalue[i, ] <- c(gwr.b[i, ], dispersiongwr[i])/stderror[i, ]
-    pvalue[i, ] <- 2 * pnorm(-abs(zvalue[i, ]))
-    
-    
-    Vi[i,] <- lm.i$v ; Hat[i,] <- X[i,] %*% solve(t(X) %*% diag(w.i) %*% X) %*% t(X) %*% diag(w.i)
-    if(!is.null(gwr.diag)){
-      diag.i <- gwer.diag(lm.i)
-      
-      resid.diagst[i] <- diag.i$rs[i] ; resid.diagcd[i] <- diag.i$rd[i]
-      GL[i,] <- diag.i$GL ; GLbeta[i,] <- diag.i$GLbeta ; GLphi[i,] <- diag.i$GLphi
-      Cih[i,] <- diag.i$Cih ; Cic[i,] <- diag.i$Cic ; Lmaxr[i,] <- diag.i$Lmaxr
-      for(j in 1:p){Cmaxc[[j]][i,] <- diag.i$Cmaxc[j,]}
-      DGbeta[i,] <- diag.i$DGbeta ; DGphi[i,] <- diag.i$DGphi ; hat[i,] <- diag.i$h
+
+ 
+    if (!fp.given && hatmatrix) {   
+      if(spdisp){
+        stderror[i, ] <- c(rowlen[1:p] * sqrt(lm.i$dispersion/lm.i$scale), sqrt(4*lm.i$dispersion^2/(sum(lm.i$gweights)*lm.i$scaledispersion)))
+        zvalue[i, ] <- c(gwr.b[i, 1:p])/stderror[i, 1:p]
+        pvalue[i, ] <- 2 * pnorm(-abs(zvalue[i, ]))
+      } else {
+        stderror[i, ] <- rowlen[1:p] * sqrt(lm.i$dispersion/lm.i$scale)
+        zvalue[i, ] <- c(gwr.b[i, ])/stderror[i, ]
+        pvalue[i, ] <- 2 * pnorm(-abs(zvalue[i, ]))
+      }
+      Hat[i,] <- X[i,] %*% solve(t(X) %*% diag(w.i) %*% X) %*% t(X) %*% diag(w.i)    
     }
   }
+  
   
   if (any(wzero)) {
     fittedgwr[wpos] <- v_fitteds/w[wpos]
@@ -404,16 +427,18 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
       if (length(offset.org) > 1) 
         offset.org[wzero]
     else 0
-    residgwr[wpos] <- v_resids
-    residgwr[wzero] <- (Y.org[wzero] - fitted[wzero])/sqrt(fit$dispersiongwr)
+    resid.ord[wpos] <- v_resids
+    resid.ord[wzero] <- (Y.org[wzero] - fitted[wzero])/sqrt(dispersiongwr)
   }	
   else {
     fittedgwr <- v_fitteds/w
-    residgwr <- v_resids
+    resid.ord <- v_resids
   }
   
-  df <- data.frame(sum.w = sum.w, gwr.b, dispersion = dispersiongwr, stderror)
-  df[[resid_name]] <- residgwr
+  df <- data.frame(sum.w = sum.w, gwr.b)
+  if (!fp.given && hatmatrix)
+    df <- data.frame(sum.w = sum.w, gwr.b, stderror)
+  df[[resid_name]] <- v_resids
   SDF <- SpatialPointsDataFrame(coords = fit.points, data = df, 
                                 proj4string = CRS(p4s))
   if (griddedObj) {
@@ -427,12 +452,41 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
     }
   }
   
+
+  if (!fp.given && hatmatrix) {
+    nu1 <- sum(diag(Hat)) ; nu2 <- sum(diag(t(Hat)%*%Hat)) ; res <- (Y - fittedgwr)/sqrt(dispersiongwr)
+    logLik <- -0.5 * sum(log(dispersiongwr)) + sum(family$g0(res, df = family$df, s = family$s, r = family$r,
+                                                             alpha = family$alpha, mp = family$mp, epsi = family$epsi,
+                                                             sigmap = family$sigmap, k = family$k))
+    AIC <- 2*nu1 - 2*logLik
+    AICc <- 2*nu1 - 2*logLik + 2*(nu1)*(nu1+1)/(dp.n-nu1-1)
+    BIC <- log(dp.n)*nu1 - 2*logLik
+    
+    edf <- dp.n - 2 * nu1 + nu2
+    
+    results <- list(df.residuals = df.residuals, nu1 = nu1, nu2 = nu2, edf = edf, 
+                    logLik = - 2*logLik, AIC = AIC, AICc = AICc, BIC = BIC)
+    
+    local.coef <- list(est = gwr.b, se = stderror, pvalue = pvalue)
+  }else {
+    local.coef <- list(est = gwr.b)
+    results <- Hat <- NULL
+  }
+  
+  if(parplot == TRUE){
+    par(mfrow = c(ceiling(sqrt(p)),ceiling(sqrt(p))))
+    for(i in 1:p){
+      boxplot(gwr.b[ , i], ylab=substitute(expression(beta[j]), list(j=i-1)))
+    }
+    if(spdisp)
+      boxplot(dispersiongwr, ylab=expression(phi))
+  }
   
   
   fit <- c(fit, list(assign = asgn, df.residuals = df.residuals, 
                      family = family, user.def = user.def, formula = as.vector(attr(Terms, 
-                                                                                    "formula")), terms = Terms, contrasts = attr(X, 
-                                                                                                                                 "contrasts"), control = control, call = call))
+                     "formula")), terms = Terms, contrasts = attr(X, "contrasts"), 
+                     control = control, call = call))
   
   if (y) 
     fit$y <- if (exists("Y.org", frame = sys.nframe())) 
@@ -446,43 +500,14 @@ gwer <- function (formula, coords, bandwidth, gweight = gwr.Gauss, adapt = NULL,
   if (model) 
     fit$model <- m
   attr(fit, "class") <- c("elliptical", "glm", "lm")
-  
-  nu1 <- sum(diag(Hat)) ; res <- (Y - fittedgwr)/sqrt(dispersiongwr)
-  logLik <- -0.5 * sum(log(dispersiongwr)) + sum(family$g0(res, df = family$df, s = family$s, 
-                                                           r = family$r, alpha = family$alpha, mp = family$mp, 
-                                                           epsi = family$epsi, sigmap = family$sigmap, k = family$k))
-  
-  
-  AIC <- 2*nu1 - 2*logLik
-  AICc <- 2*nu1 - 2*logLik + 2*(nu1)*(nu1+1)/(n-nu1-1)
-  BIC <- log(n)*nu1 - 2*logLik
-  
-  results <- list(df.residuals = df.residuals, dispersion = dispersiongwr, V = Vi, logLik = - 2*logLik, 
-                  AIC = AIC, AICc = AICc, BIC = BIC)
-  
-  diagnostic <- NULL
-  if(gwr.diag == TRUE){
-    residgwr <- list(ord = residgwr, st = resid.diagst, cd = resid.diagcd)
-    diagnostic <- list(GL = diag(GL), GLbeta = diag(GLbeta), GLphi = diag(GLphi), 
-                       Cih = diag(Cih), Cic = diag(Cic), Lmaxr = diag(Lmaxr),
-                       Cmaxc = lapply(Cmaxc,function(x){diag(x)}), DGbeta = diag(DGbeta),
-                       DGphi = diag(DGphi))
-  }
 
+  z <- list(SDF = SDF, coef = local.coef, dispersion = dispersiongwr, hat = Hat, lm = fit, 
+            results = results, bandwidth = bw, fitted = fittedgwr, hatmatrix = hatmatrix, 
+            gweights = gweights, family = fit$family, flm = local.fitted, adapt = adapt,
+            gweight = deparse(substitute(gweight)), spdisp = spdisp, this.call = this.call, 
+            fp.given = fp.given, longlat = longlat, type = type)
   
-  if(parplot == TRUE){
-    par(mfrow = c(ceiling(sqrt(p)),ceiling(sqrt(p))))
-    for(i in 1:p){
-      boxplot(gwr.b[ , i], ylab=substitute(expression(beta[j]), list(j=i-1)))
-    }
-    boxplot(dispersiongwr, ylab=expression(phi))
-  }
-  
-  z <- list(SDF = SDF, coef = gwr.b, se = stderror, pvalue = pvalue, lhat = Hat, lm = fit, Weights = gWeights, results = results, fitted = fittedgwr, diag = diagnostic,
-            bandwidth = bw, adapt = adapt, hatmatrix = FALSE, gweight = deparse(substitute(gweight)), residuals = residgwr,
-            fp.given = fp.given,  this.call = this.call)
-  
-  class(z) <- "gwr"
+  class(z) <- "gwer"
   invisible(z)
 }
 
@@ -495,33 +520,39 @@ gwer.fit <- function (X, Y, gweights=NULL, offset, family, dispersion,
   n <- nrow(X)
   if(is.null(gweights))
     gweights <- rep(1,n)
-  if (is.null(offset)) {
+  if (is.null(offset)) 
     offset <- rep(0, n)
-  }
-  
+
   p <- ncol(X)
-  aux.model <- glm.fit(x = X, y = Y, offset = offset,
+  aux.model <- glm.fit(x = X, y = Y, offset = offset, weights = gweights,
                        family = gaussian())
   attr(aux.model, "class") <- c("glm", "lm")
   start <- aux.model$coef
   
   is.null.disp <- is.null(dispersion)
   elliptical.disp <- !is.null.disp && !is.numeric(dispersion)
-  if (is.null.disp) 
+  if (is.null.disp){
+    options(warn = -1)
     dispersion <- (summary(aux.model)$dispersion)
-  if (elliptical.disp) 
+    options(warn = 0) 
+  }
+  if (elliptical.disp){
+    options(warn = -1)
     dispersion <- (summary(aux.model)$dispersion)
+    options(warn = 0)
+  }
   args <- resid(aux.model)/sqrt(dispersion)
   
   if (any(nas <- is.na(start))) {
     names(nas) <- dimnames(X)[[2]]
     X <- X[, !nas]
-    aux.model <- glm.fit(x = X, y = Y, offset = offset, 
+    aux.model <- glm.fit(x = X, y = Y, offset = offset, weights = gweights,
                          family = gaussian())
     attr(aux.model, "class") <- c("glm", "lm")
     start <- aux.model$coef
+    options(warn = -1)
     dispersion <- (summary(aux.model)$dispersion)
-    
+    options(warn = 0)
   }
   
   
@@ -557,10 +588,10 @@ gwer.fit <- function (X, Y, gweights=NULL, offset, family, dispersion,
     start <- new.start
     
     abs.res <- Y - X %*% start - offset
-    
+
     if (is.null.disp) {
       aux.dispersion <- dispersion
-      new.dispersion <- mean((-2 * w.1 * gweights) * abs.res^2)
+      new.dispersion <- sum((-2 * w.1 * gweights) * abs.res^2)/(sum(gweights))
       error2 <- abs((new.dispersion - dispersion)/dispersion)
       dispersion <- new.dispersion
     }
@@ -626,214 +657,92 @@ gwer.fit <- function (X, Y, gweights=NULL, offset, family, dispersion,
   fit <- list(coefficients = coefs, dispersion = dispersion, gweights = gweights,
               fixed = !is.null.disp, residuals = residuals, fitted.values = fitted, 
               loglik = loglik, convergence = linearconv, Wg = family$g1(residuals, df = family$df, 
-                                                                        r = family$r, s = family$s, alpha = family$alpha, 
-                                                                        mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                        k = family$k), Wgder = family$g5(residuals, df = family$df, 
-                                                                                                         r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                                         mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                                         k = family$k), v = -2 * family$g1(residuals, df = family$df, 
-                                                                                                                                           r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                                                                           mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                                                                           k = family$k), rank = rank, R = as.matrix(R),  iter = iter - 
-                1, scale = 4 * family$g2(residuals, df = family$df, 
-                                         r = family$r, s = family$s, alpha = family$alpha, 
-                                         mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                         k = family$k), scaledispersion = -1 + 4 * family$g3(args, 
-                                                                                             df = family$df, r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                             mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                             k = family$k), scalevariance = family$g4(args, df = family$df, 
-                                                                                                                                      r = family$r, s = family$s, alpha = family$alpha, 
-                                                                                                                                      mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
-                                                                                                                                      k = family$k), df = if (charmatch(family$family, 
-                                                                                                                                                                        "Student", F)) family$df, s = if (charmatch(family$family, 
-                                                                                                                                                                                                                    "Gstudent", F)) family$s, r = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                "Gstudent", F)) family$r, alpha = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                "Glogis", F)) family$alpha, mp = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                               "Glogis", F)) family$m, epsi = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                                                                            "Cnormal", F)) family$epsi, sigmap = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                               "Cnormal", F)) family$sigmap, k = if (charmatch(family$family, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               "Powerexp", F)) family$k, Xmodel = matrix(Xd[, (1:rank)],nrow(Xd), rank))
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), Wgder = family$g5(residuals, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), v = -2 * family$g1(residuals, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), rank = rank, R = as.matrix(R),  iter = iter - 
+              1, scale = 4 * family$g2(residuals, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), scaledispersion = -1 + 4 * family$g3(args, 
+              df = family$df, r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), scalevariance = family$g4(args, df = family$df, 
+              r = family$r, s = family$s, alpha = family$alpha, 
+              mp = family$mp, epsi = family$epsi, sigmap = family$sigmap, 
+              k = family$k), df = if (charmatch(family$family, 
+              "Student", F)) family$df, s = if (charmatch(family$family, 
+              "Gstudent", F)) family$s, r = if (charmatch(family$family, 
+              "Gstudent", F)) family$r, alpha = if (charmatch(family$family, 
+              "Glogis", F)) family$alpha, mp = if (charmatch(family$family, 
+              "Glogis", F)) family$m, epsi = if (charmatch(family$family, 
+              "Cnormal", F)) family$epsi, sigmap = if (charmatch(family$family, 
+              "Cnormal", F)) family$sigmap, k = if (charmatch(family$family, 
+              "Powerexp", F)) family$k, Xmodel = matrix(Xd[, (1:rank)],nrow(Xd), rank))
   fit
 }
 
 
-gwer.diag <- function (ellipticalfit, weighting = "observed") 
-{
-  Wi <- diag(ellipticalfit$gweights)
-  scalevariance <- ellipticalfit$scalevariance
-  scaledispersion <- ellipticalfit$scaledispersion
-  scale <- ellipticalfit$scale
-  family <- ellipticalfit$family
-  user.def <- ellipticalfit$user.def
-  f.name <- family[[1]]
-  dispersion <- ellipticalfit$dispersion
-  w <- if (is.null(ellipticalfit$weights)) 
-    rep(1, length(ellipticalfit$residuals))
-  else ellipticalfit$weights
-  wzero <- (w == 0)
-  
-  resid <- ellipticalfit$residuals[!wzero]
-  Xd <- diag(c(w[!wzero])) %*% ellipticalfit$Xmodel[!wzero, 
-                                                    ]
-  dev <- 2 * (family$g0(resid, df = family$df, r = family$r, 
-                        s = family$s, alpha = family$alpha, mp = family$mp, 
-                        epsi = family$epsi, sigmap = family$sigmap, k = family$k) - 
-                family$g0(0, df = family$df, r = family$r, s = family$s, 
-                          alpha = family$alpha, mp = family$mp, epsi = family$epsi, 
-                          sigmap = family$sigmap, k = family$k))
-  p <- ellipticalfit$rank
-  H <- Xd %*% solve(t(Xd) %*% Wi %*% Xd) %*% t(Xd) %*% Wi
-  Hi <- Xd %*% solve(t(Xd) %*% Wi %*% Xd) %*% t(Xd) %*% Wi
-  h <- diag(H)/(scalevariance * scale)
-  rs <- resid/sqrt(scalevariance * (1 - h))
-  ro <- ellipticalfit$y[!wzero] - ellipticalfit$fitted[!wzero]
-  n <- length(resid)
-  Ones <- rep(1,n)
-  u <- ro^2/dispersion
-  
-  rdesvio <- rep(0,n)
-  for(i in 1:n){
-    logg0 <- family$g0(0, df = family$df, s = family$s, 
-                       r = family$r, alpha = family$alpha, mp = family$mp, 
-                       epsi = family$epsi, sigmap = family$sigmap, k = family$k)
-    loggu <- family$g0(u[i], df = family$df, s = family$s, 
-                       r = family$r, alpha = family$alpha, mp = family$mp, 
-                       epsi = family$epsi, sigmap = family$sigmap, k = family$k)
-    rdesvio[i] <- sqrt(Wi[i,i])*(sign(resid[i]))*(2*logg0 - 2*loggu)^(.5)
+#' @rdname gwer
+#' @method print gwer
+#' @noRd
+#' @export
+print.gwer <- function(x, ...) {
+  if(class(x) != "gwer") 
+    stop("not a gwer object")
+  cat("Call:\n")
+  print(x$this.call)
+  cat("Kernel function:", x$gweight, "\n")
+  n <- length(x$lm$residuals)
+  if (is.null(x$adapt)) cat("Fixed bandwidth:", x$bandwidth, "\n")
+  else cat("Adaptive quantile: ", x$adapt, " (about ", 
+           floor(x$adapt*n), " of ", n, " data points)\n", sep="")
+  if (x$fp.given) cat("Fit points: ", nrow(x$SDF), "\n", sep="")
+  m <- length(x$lm$coefficients)
+  cat("Summary of GWER coefficient estimates at ",
+      ifelse(x$fp.given, "fit", "data"), " points:\n", sep="")
+  if(!x$spdisp){
+    df0 <- as(x$SDF, "data.frame")[,(1+(1:m)), drop=FALSE]
+  } else {
+    df0 <- as(x$SDF, "data.frame")[,(1+(1:(m+1))), drop=FALSE]
   }
-  
-  ct <- ellipticalfit$Wgder[!wzero]
-  op <- ellipticalfit$Wg[!wzero] * ro
-  a <- ellipticalfit$v[!wzero] - 4 * ct * u
-  b <- op + (u * ct * ro)
-  db <- diag(b)
-  b <- matrix(b, n, 1)
-  u <- matrix(u, n, 1)
-  da <- diag(a)
-  dai <- diag(1/a)
-  ro <- matrix(ro, n, 1)
-  som <- matrix(0, p, p)
-  M <- as.matrix(som + t(Xd) %*% da %*% Wi %*% Xd)
-  lbb <- (-1/dispersion) * M
-  lby <- (1/dispersion) * t(Xd) %*% Wi %*% da
-  lphiy <- (-2/(dispersion^2)) * t(b) %*% Wi
-  lbphi <- (2/dispersion^2) * t(Xd) %*% Wi %*% b
-  lphib <- t(lbphi)
-  lphi <- (1/(dispersion^2)) * ((t(Ones)%*%Wi%*%Ones)/2 + t(u) %*% diag(ct) %*% 
-                                  Wi %*% u - (1/dispersion) * t(ro) %*% diag(ellipticalfit$v[!wzero]) %*% 
-                                  Wi %*% ro)
-  lbb1 <- solve(lbb)
-  lc1 <- lbb1
-  E <- as.vector(lphi - lphib %*% lbb1 %*% lbphi)
-  Fi <- -lbb1 %*% lbphi
-  GLbeta <- Xd %*% (-lbb1) %*% lby
-  R <- Xd %*% (Fi %*% t(Fi) %*% lby + Fi %*% lphiy)
-  GLphi <- (-1/E) * R
-  G <- GLphir <- matrix(0, n, n)
-  
-  Om <- rbind(cbind(lbb, lbphi), cbind(lphib, lphi))
-  Fr <- -lc1 %*% lbphi
-  lc1 <- lc1 + (1/E) * Fr %*% t(Fr)
-  lc2 <- (1/E) * Fr
-  lc3 <- t(lc2)
-  lc4 <- matrix(1/E, 1, 1)
-  lc <- cbind(rbind(lc1, lc3), rbind(lc2, lc4))
-  GLbeta <- diag(GLbeta)
-  GLphi <- diag(GLphi)
-  GLphir <- diag(GLphir)
-  G <- diag(G)
-  GL <- GLbeta + G + GLphi + GLphir
-  Bi <- (a/dispersion) * GL
-  
-  DGbeta <- DGphi <- matrix(0,n,1)
-  vu2 <- ellipticalfit$v[!wzero]^2
-  for(i in 1:n){
-    Delta <- diag(0,n) ; Delta[i,i] = 1
-    Delta <- diag(1,n) - Delta; 
-    DGbeta[i] <- (vu2[i]/scale*(1 - H[i,i])^2)* u[i]*Wi[i,i]*H[i,i]
-    DGphi[i] <- (sum(diag(Wi))*(sqrt(vu2[i])*u[i]-1)^2*Wi[i,i]^2)/((sum(diag(Wi%*%Delta)))^2*scaledispersion)
+  if (any(is.na(df0))) {
+    df0 <- na.omit(df0)
+    warning("NAs in coefficients dropped")
   }
-  
-  deltab <- matrix(0, n, p)
-  deltad <- matrix(0, n, 1)
-  deltab <- (1/dispersion) * diag((ellipticalfit$y[!wzero] - 
-                                     ellipticalfit$fitted[!wzero]) * ellipticalfit$v[!wzero]) %*% 
-    Wi %*% Xd
-  deltad <- Wi %*% matrix(-(0.5/dispersion) * (1 - ellipticalfit$v[!wzero] * 
-                                                 u), n, 1)
-  delta <- t(cbind(deltab, deltad))
-  b11 <- cbind(matrix(0, p, p), matrix(0, p, 1))
-  b12 <- cbind(matrix(0, 1, p), 1/E)
-  b1 <- rbind(b11, b12)
-  b211 <- cbind(lbb1, matrix(0, p, 1))
-  b212 <- cbind(matrix(0, 1, p), matrix(0, 1, 1))
-  b2 <- rbind(b211, b212)
-  Cic <- -t(delta) %*% (lc) %*% delta
-  Cic <- 2 * diag(Cic)
-  A <- as.matrix(t(delta) %*% (lc) %*% delta)
-  decA <- eigen(A)
-  Lmax <- decA$val[1]
-  dmax <- decA$vec[, 1]
-  dmax <- dmax/sqrt(Lmax)
-  dmaxc <- abs(dmax)
-  
-  deltab <- (-2/dispersion) * t(Xd) %*% Wi %*% db
-  deltad <- (-1/(dispersion^2)) * t(ro) %*% Wi %*% db
-  delta <- rbind(deltab, deltad)
-  b11 <- cbind(matrix(0, p, p), matrix(0, p, 1))
-  b12 <- cbind(matrix(0, 1, p), 1/lphi)
-  b1 <- rbind(b11, b12)
-  b211 <- cbind(lbb1, matrix(0, p, 1))
-  b212 <- cbind(matrix(0, 1, p), 0)
-  b2 <- rbind(b211, b212)
-  Ci <- -t(delta) %*% (lc) %*% delta
-  Cih <- 2 * diag(Ci)
-  A <- as.matrix(t(delta) %*% (lc) %*% delta)
-  decA <- eigen(A)
-  Lmax <- decA$val[1]
-  dmax <- decA$vec[, 1]
-  dmax <- dmax/sqrt(Lmax)
-  dmax <- abs(dmax)
-  
-  deltab <- (1/dispersion) * t(Xd) %*% Wi %*% da
-  deltad <- (-2/(dispersion^2)) * t(b) %*% Wi
-  delta <- rbind(deltab, deltad)
-  b11 <- cbind(matrix(0, p, p), matrix(0, p, 1))
-  b12 <- cbind(matrix(0, 1, p), 1/lphi)
-  b1 <- rbind(b11, b12)
-  b211 <- cbind(lbb1, matrix(0, p, 1))
-  b212 <- cbind(matrix(0, 1, p), 0)
-  b2 <- rbind(b211, b212)
-  Ci <- -t(delta) %*% (lc) %*% delta
-  Ci <- 2 * diag(Ci)
-  ds <- diag(sqrt(dispersion), n)
-  deltai <- (1/dispersion) * t(Xd) %*% da %*% Wi %*% ds
-  Lmax <- NULL
-  A <- matrix(0, n, n)
-  for (i in 1:n) {
-    A[, i] <- as.matrix(t(deltai) %*% solve(t(Xd) %*% da %*% 
-                                              Wi %*% Xd) %*% matrix(Xd[i, ], p, 1))
-  }	
-  Lmaxr <- abs(diag(A))
-  
-  Cmaxc <- Lmaxc <- matrix(0, p, n)
-  for (j in 1:p) {
-    Ff <- matrix(0, p, n)
-    Ff[j, ] <- rep(1, n)
-    De <- diag(as.vector(ro), n)
-    Dv <- diag(ellipticalfit$v[!wzero])
-    st <- sqrt(var(Xd[, j]))
-    for (i in 1:n) {
-      A[, i] <- st * (1/dispersion) * t(Ff %*% De %*% 
-                                          Wi %*% Dv - ellipticalfit$coef[j] * t(Xd) %*% Wi %*% da) %*% 
-        solve(t(Xd) %*% da %*% Wi %*% Xd) %*% matrix(Xd[i, 
-                                                        ], p, 1)
-      Cmaxc[j, i] <- 2 * abs(t(A[, i]) %*% A[, i])
+  CM <- t(apply(df0, 2, summary))[,c(1:3,5,6)]
+  if (is.null(dim(CM))) CM <- t(as.matrix(CM))
+  if (!x$fp.given) {
+    if(!x$spdisp){
+      CM <- cbind(CM, c(coefficients(x$lm)))
+    } else {
+      CM <- cbind(CM, c(coefficients(x$lm),x$lm$dispersion))
     }
-    Lmaxc[j, ] <- abs(diag(A))
+    colnames(CM) <- c(colnames(CM)[1:5], "Global")
   }
-  
-  list(resid = resid, rs = rs, rd = rdesvio, dispersion = dispersion, h = diag(H), Hat = Hi, 
-       GL = GL, GLbeta = GLbeta, GLphi = GLphi, DGbeta = DGbeta, DGphi = DGphi, Cih = Cih, 
-       Cic = Cic, Lmaxr = Lmaxr, Lmaxc = Lmaxc, Cmaxc = Cmaxc)
+  printCoefmat(CM)
+  cat("Number of data points:", n, "\n")
+  if(!x$spdisp)
+    cat("Global dispersion:", x$lm$dispersion, "\n")
+  if (x$hatmatrix) {
+    cat("Effective number of parameters (residual: 2traceS - traceS'S):", 2*x$results$nu1 -
+          x$results$nu2, "\n")
+    cat("Effective degrees of freedom (residual: 2traceS - traceS'S):", x$results$edf, "\n")
+    cat("Effective number of parameters (model: traceS):",
+        x$results$nu1, "\n")
+    cat("Effective degrees of freedom (model: traceS):",
+        (n - x$results$nu1), "\n")
+    cat("AIC:", x$results$AIC, " AICc:", x$results$AICc, " BIC:", x$results$BIC, "\n")
+    #cat("AIC:", x$results$AIC, "\n")
+    #cat("AICc:", x$results$AICc, "\n")
+    #cat("BIC:", x$results$BIC, "\n")
+    #cat("Residual sum of squares:", x$results$rss, "\n")
+    #cat("Quasi-global R2:", (1 - (x$results$rss/x$gTSS)), "\n")
+  }
+  invisible(x)
 }
