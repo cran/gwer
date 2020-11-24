@@ -4,8 +4,16 @@
 \alias{elliptical.diag.plots}
 \title{Diagnostic Plots for Elliptical Regression Models}
 \usage{
-elliptical.diag.plots(object, ellipticaldiag = NULL, which,
-  subset = NULL, iden = FALSE, labels = NULL, ret = FALSE, ...)
+elliptical.diag.plots(
+  object,
+  ellipticaldiag = NULL,
+  which,
+  subset = NULL,
+  iden = FALSE,
+  labels = NULL,
+  ret = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{an object with the result of the fitted elliptical regression model.}

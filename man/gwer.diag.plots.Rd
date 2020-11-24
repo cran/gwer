@@ -4,8 +4,16 @@
 \alias{gwer.diag.plots}
 \title{Diagnostic Plots for Geographically Weighted Elliptical Regression Models}
 \usage{
-gwer.diag.plots(object, gwerdiag = NULL, which, subset = NULL,
-  iden = F, labels = NULL, ret = F, ...)
+gwer.diag.plots(
+  object,
+  gwerdiag = NULL,
+  which,
+  subset = NULL,
+  iden = F,
+  labels = NULL,
+  ret = F,
+  ...
+)
 }
 \arguments{
 \item{object}{an object with the result of the fitted geographically weighted elliptical regression models.}

@@ -4,8 +4,7 @@
 \alias{anova.elliptical}
 \title{Analysis of Deviance for Elliptical Model Fits}
 \usage{
-\method{anova}{elliptical}(object, ..., dispersion = NULL,
-  test = c("Chisq"))
+\method{anova}{elliptical}(object, ..., dispersion = NULL, test = c("Chisq"))
 }
 \arguments{
 \item{object}{an object with the result of the fitted elliptical regression model.}

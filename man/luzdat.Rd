@@ -4,13 +4,15 @@
 \name{luzdat}
 \alias{luzdat}
 \title{Brightness of Snacks Dataset}
-\format{The "data" slot is a data frame with 150 observations on the following 4 variables.
+\format{
+The "data" slot is a data frame with 150 observations on the following 4 variables.
 \describe{
 \item{y}{the brightness of the product on a scale of 0 to 100 (the higher the value the product lighter).}
 \item{x1}{its the type compositions for the news snacks.}
 \item{x2}{its the time (in weeks) when was measurements the brightness of the product.}
 \item{rot}{a characters vector that indicate the group-week-measurement for each snack.}
-}}
+}
+}
 \usage{
 data(luzdat)
 }

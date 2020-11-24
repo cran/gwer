@@ -90,7 +90,7 @@
 #' @rdname gwer
 #' @export
 
-gwer <- function (formula, data = sys.parent(), coords, bandwidth, gweight = gwr.Gauss, 
+gwer <- function (formula, data, coords, bandwidth, gweight = gwr.Gauss, 
                   adapt = NULL, hatmatrix = FALSE, fit.points, family = Normal, longlat = NULL, 
                   weights, dispersion = NULL, subset, na.action = "na.fail", method = "gwer.fit",
                   control = glm.control(epsilon = 1e-04, maxit = 100, trace = F), model = FALSE,
@@ -483,7 +483,7 @@ gwer <- function (formula, data = sys.parent(), coords, bandwidth, gweight = gwr
   }
   
   
-  fit <- c(fit, list(assign = asgn, df.residuals = df.residuals, 
+  fit <- c(fit, list(assign = asgn, df.residuals = df.residuals, data = data,
                      family = family, user.def = user.def, formula = as.vector(attr(Terms, 
                      "formula")), terms = Terms, contrasts = attr(X, "contrasts"), 
                      control = control, call = call))

@@ -5,11 +5,23 @@
 \alias{print.elliptical}
 \title{Elliptical Regression Models}
 \usage{
-elliptical(formula = formula(data), family = Normal,
-  data = sys.parent(), dispersion = NULL, weights, subset,
-  na.action = "na.fail", method = "elliptical.fit",
+elliptical(
+  formula = formula(data),
+  family = Normal,
+  data,
+  dispersion = NULL,
+  weights,
+  subset,
+  na.action = "na.fail",
+  method = "elliptical.fit",
   control = glm.control(epsilon = 1e-04, maxit = 100, trace = F),
-  model = F, x = F, y = T, contrasts = NULL, offset, ...)
+  model = F,
+  x = F,
+  y = T,
+  contrasts = NULL,
+  offset,
+  ...
+)
 }
 \arguments{
 \item{formula}{regression model formula as in \code{glm}.}

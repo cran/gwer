@@ -5,13 +5,33 @@
 \alias{print.gwer}
 \title{Geographically Weighted Elliptical Regression}
 \usage{
-gwer(formula, data = sys.parent(), coords, bandwidth,
-  gweight = gwr.Gauss, adapt = NULL, hatmatrix = FALSE, fit.points,
-  family = Normal, longlat = NULL, weights, dispersion = NULL,
-  subset, na.action = "na.fail", method = "gwer.fit",
+gwer(
+  formula,
+  data,
+  coords,
+  bandwidth,
+  gweight = gwr.Gauss,
+  adapt = NULL,
+  hatmatrix = FALSE,
+  fit.points,
+  family = Normal,
+  longlat = NULL,
+  weights,
+  dispersion = NULL,
+  subset,
+  na.action = "na.fail",
+  method = "gwer.fit",
   control = glm.control(epsilon = 1e-04, maxit = 100, trace = F),
-  model = FALSE, x = FALSE, y = TRUE, contrasts = NULL, offset,
-  type = "pearson", spdisp = FALSE, parplot = FALSE, ...)
+  model = FALSE,
+  x = FALSE,
+  y = TRUE,
+  contrasts = NULL,
+  offset,
+  type = "pearson",
+  spdisp = FALSE,
+  parplot = FALSE,
+  ...
+)
 }
 \arguments{
 \item{formula}{regression model formula as in \code{glm}.}

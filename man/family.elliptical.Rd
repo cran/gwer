@@ -3,14 +3,14 @@
 \name{family.elliptical}
 \alias{family.elliptical}
 \alias{Cauchy}
+\alias{Cnormal}
+\alias{Gstudent}
+\alias{Glogis}
 \alias{Normal}
+\alias{Powerexp}
+\alias{Student}
 \alias{LogisI}
 \alias{LogisII}
-\alias{Student}
-\alias{Powerexp}
-\alias{Glogis}
-\alias{Gstudent}
-\alias{Cnormal}
 \title{Family Objects for Elliptical Models}
 \usage{
 \method{family}{elliptical}(object, ...)

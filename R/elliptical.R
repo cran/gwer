@@ -72,7 +72,7 @@
 #' @rdname elliptical
 #' @export
 
-elliptical <- function (formula = formula(data), family = Normal, data = sys.parent(), dispersion = NULL, 
+elliptical <- function (formula = formula(data), family = Normal, data, dispersion = NULL, 
                        weights, subset, na.action = "na.fail", method = "elliptical.fit", 
                        control = glm.control(epsilon = 1e-04, maxit = 100, trace = F), 
                        model = F, x = F, y = T, contrasts = NULL, offset, ...) 
@@ -90,6 +90,8 @@ elliptical <- function (formula = formula(data), family = Normal, data = sys.par
   if (!charmatch(method, c("model.frame", "elliptical.fit"), 
                  F)) 
     stop(paste("\n unimplemented method:", method))
+  if (missing(data)) 
+    data <- environment(formula)
   m <- match.call(expand.dots = F)
   m$family <- m$method <- m$control <- m$model <- m$dispersion <- m$x <- m$y <- m$contrasts <-  m$offset <- m$... <- NULL
   m[[1]] <- as.name("model.frame")
@@ -185,7 +187,7 @@ elliptical <- function (formula = formula(data), family = Normal, data = sys.par
     fit$R.assign <- pasgn
     fit$x.assign <- asgn
   }
-  fit <- c(fit, list(assign = asgn, df.residuals = df.residuals,  
+  fit <- c(fit, list(assign = asgn, df.residuals = df.residuals, data = data,
                      family = family, user.def = user.def, formula = as.vector(attr(Terms, 
                      "formula")), terms = Terms, contrasts = attr(X, "contrasts"), 
                      control = control, call = call))

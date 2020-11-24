@@ -4,11 +4,22 @@
 \alias{gwer.sel}
 \title{Optimization of Bandwidth for Geographically Weighted Elliptical Regression Model}
 \usage{
-gwer.sel(formula, data = list(), coords, adapt = FALSE,
-  gweight = gwr.Gauss, weights, method = "cv", verbose = TRUE,
-  longlat = NULL, family = Normal(), RMSE = FALSE,
-  tol = .Machine$double.eps^0.25, show.error.messages = FALSE,
-  maxit = 100)
+gwer.sel(
+  formula,
+  data = list(),
+  coords,
+  adapt = FALSE,
+  gweight = gwr.Gauss,
+  weights,
+  method = "cv",
+  verbose = TRUE,
+  longlat = NULL,
+  family = Normal(),
+  RMSE = FALSE,
+  tol = .Machine$double.eps^0.25,
+  show.error.messages = FALSE,
+  maxit = 100
+)
 }
 \arguments{
 \item{formula}{regression model formula as in \code{glm}.}

@@ -4,8 +4,11 @@
 \alias{residuals.elliptical}
 \title{Extract Residuals for Elliptical Model Fits}
 \usage{
-\method{residuals}{elliptical}(object, type = c("stand", "ordinal",
-  "response", "pearson", "desvio"), ...)
+\method{residuals}{elliptical}(
+  object,
+  type = c("stand", "ordinal", "response", "pearson", "desvio"),
+  ...
+)
 }
 \arguments{
 \item{object}{an object with the result of the fitted elliptical regression model.}

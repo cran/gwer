@@ -4,8 +4,11 @@
 \alias{residuals.gwer}
 \title{Extract Residuals for Geographically Weighted Elliptical Regression Model Fits}
 \usage{
-\method{residuals}{gwer}(object, type = c("stand", "ordinal", "response",
-  "pearson", "desvio"), ...)
+\method{residuals}{gwer}(
+  object,
+  type = c("stand", "ordinal", "response", "pearson", "desvio"),
+  ...
+)
 }
 \arguments{
 \item{object}{an object with the result of the fitted geographically weighted elliptical regression model.}
