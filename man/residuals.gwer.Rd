@@ -15,8 +15,7 @@
 
 \item{type}{a character string that indicates the type of residuals. If is \code{stand} will be computed the standar residuals. 
 If is \code{ordinal} will be computed the ordinal residuals. If is \code{response} will be computed the response residuals. 
-If is \code{pearson} will be computed the pearson residuals. If is \code{desvio} will be computed the desviance residuals.
-By default is \code{stand}.}
+If is \code{pearson} will be computed the pearson residuals. If is \code{desvio} will be computed the desviance residuals.}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
@@ -24,38 +23,28 @@ By default is \code{stand}.}
 Residuals of the specific \code{type} extracted from the \code{object}.
 }
 \description{
-This function compute differents type of residuals to the fittedgeographically weighted elliptical regression model.
+This function compute different types of residuals to the fitted geographically weighted elliptical regression model.
 }
 \examples{
-data(columbus, package="spData")
-fit.lm <- lm(CRIME ~ INC, data=columbus)
-summary(fit.lm)
-gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Normal(),
-                 coords=cbind(columbus$X, columbus$Y))
-fit.gwer <- gwer(CRIME ~ INC, family = Normal(), bandwidth = gwer.bw, 
-                 spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
-                 coords=cbind(columbus$X, columbus$Y))
-residuals(fit.gwer, type = "stand")
 \donttest{
-data(columbus, package="spData")
-fit.elliptical <- elliptical(CRIME ~ INC, family = Student(df=4), data=columbus)
-summary(fit.elliptical)
-gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Student(df=4),
-                 coords=cbind(columbus$X, columbus$Y), method = 'aic')
-gwer.fitt <- gwer(CRIME ~ INC, family = Student(df=4), bandwidth = gwer.bw, hatmatrix = TRUE,
-                 spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
-                 coords=cbind(columbus$X, columbus$Y))
-residuals(gwer.fitt)  
+data(georgia, package = "spgwr")
+fit.formula <- PctBach ~ TotPop90 + PctRural + PctFB + PctPov
+gwer.bw.t <- bw.gwer(fit.formula, data = gSRDF, family = Student(3), adapt = TRUE)
+gwer.fit.t <- gwer(fit.formula, data = gSRDF, family = Student(3), bandwidth = gwer.bw.t, 
+                   adapt = TRUE, parplot = FALSE, hatmatrix = TRUE, spdisp = TRUE, 
+                   method = "gwer.fit")
+summary(gwer.fit.t) 
+residuals(gwer.fit.t, type = "stand") 
 }
 }
 \references{
 Brunsdon, C., Fotheringham, A. S. and Charlton, M. E. (1996). 
 Geographically weighted regression: a method for exploring spatial nonstationarity.
-Geographical analysis, 28(4), 281-298. \url{https://doi.org/10.1111/j.1538-4632.1996.tb00936.x}
+Geographical analysis, 28(4), 281-298. \doi{10.1111/j.1538-4632.1996.tb00936.x}
 
 Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
 symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
-\url{https://doi.org/10.1016/j.spl.2005.04.033}
+\doi{10.1016/j.spl.2005.04.033}
 }
 \seealso{
 \code{\link{residuals}}, \code{\link{gwer}}, \code{\link{family.elliptical}}

@@ -3,32 +3,30 @@
 #' @import graphics
 #' @description This function generate diagnostic measures plots for the fitted elliptical regression models.
 #' @param object an object with the result of the fitted elliptical regression model.
-#' @param ellipticaldiag objects containing the diagnostic measures. If is \code{NULL} (by default) is obtained from object.
-#' @param which an optional numeric value with the number of plot returned.
+#' @param ellipticaldiag object list containing the diagnostic measures. By default it is obtained from the object, but can be calculated using \code{\link{elliptical.diag}}.
+#' @param which an optional numeric value with the number of only plot that must be returned.
 #' @param subset an optional numeric vector specifying a subset of observations to be used in the fitting process.
-#' @param iden a logical value used to identify observations. If \code{TRUE} the observations are identified in the graphic window. 
-#' @param labels a optinal string vector specifying a labels plots.
-#' @param ret a logical value to return the diagnostic measures computing. If \code{FALSE} (by default) not return the diagnostic measures.
+#' @param iden a logical value used to identify observations. If \code{TRUE} the observations are identified by user in the graphic window.
+#' @param labels a optional string vector specifying a labels plots.
+#' @param ret a logical value used to return the diagnostic measures computing. If \code{TRUE} the diagnostic measures are returned (see \code{\link{elliptical.diag}} for more details).
 #' @param ... graphics parameters to be passed to the plotting routines.
-#' @return Return an interactive menu with eleven options to make plots. This menu contains the follows graphics :
+#' @return Return an interactive menu with eleven options to make plots. This menu contains the follows graphics:
 #' 1: plot: All.
 #' 2: plot: Response residual against fitted values.
 #' 3: plot: Response residual against index.
 #' 4: plot: Standardized residual against fitted values.
 #' 5: plot: Standardized residual against index.
-#' 6: plot: QQ-plot of  response residuals.
-#' 7: plot: QQ-plot of  Standardized residuals.
-#' 8: plot: Generalized Leverage.
-#' 9: plot: Local influence on the response against index.
-#' 10: plot: Local influence on the scale against index.
-#' 11: plot: Local influence for case-weight against index.
-#' If \code{which} is provided return an unique graphic selected. If \code{ret} is \code{TRUE} returns a list of diagnostic arrays 
-#' (see \code{elliptical.diag} for more details).
+#' 6: plot: QQ-plot of response residuals.
+#' 7: plot: QQ-plot of standardized residuals.
+#' 8: plot: Generalized leverage.
+#' 9: plot: Total local influence index plot for response perturbation.
+#' 10: plot: Total local influence index plot scale perturbation.
+#' 11: plot: Total local influence index plot case-weight perturbation.
 #' @references Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
 #' symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
-#' \url{https://doi.org/10.1016/j.spl.2005.04.033}
+#' \doi{10.1016/j.spl.2005.04.033}
 #' @seealso \code{\link{elliptical}}, \code{\link{elliptical.diag}}
-#' @keywords Elliptical models
+#' @keywords Elliptical regression models
 #' @keywords Diagnostic methods
 #' @examples
 #' data(luzdat)
@@ -41,7 +39,6 @@
 #' data=luz)
 #' elliptical.diag.plots(elliptical.fitt, which=3)
 #' @export
-
 
 elliptical.diag.plots <- function (object, ellipticaldiag = NULL, which, 
           subset = NULL, iden = FALSE, labels = NULL, ret = FALSE, ...) 
@@ -70,10 +67,11 @@ elliptical.diag.plots <- function (object, ellipticaldiag = NULL, which,
   wzero <- (w == 0)
   choices <- c("All", "Response residual against fitted values", 
                "Response residual against index", "Standardized residual against fitted values", 
-               "Standardized residual against index", "QQ-plot of  response residuals", 
-               "QQ-plot of  Standardized residuals", "Generalized Leverage ", 
-               "Local influence on the response against index", "Local influence on the scale against index", 
-               "Local influence for case-weight against index\n")
+               "Standardized residual against index", "QQ-plot of response residuals", 
+               "QQ-plot of standardized residuals", "Generalized leverage", 
+               "Total local influence index plot for response perturbation", 
+               "Total local influence index plot scale perturbation", 
+               "Total local influence index plot case-weight perturbation\n")
   tmenu <- paste("plot:", choices)
   if (missing(which)) 
     pick <- menu(tmenu, title = "\n Make a plot selection (or 0 to exit)\n")

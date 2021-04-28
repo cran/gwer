@@ -3,7 +3,7 @@
 \name{elliptical}
 \alias{elliptical}
 \alias{print.elliptical}
-\title{Elliptical Regression Models}
+\title{Fitting Elliptical Regression Models}
 \usage{
 elliptical(
   formula = formula(data),
@@ -24,23 +24,23 @@ elliptical(
 )
 }
 \arguments{
-\item{formula}{regression model formula as in \code{glm}.}
+\item{formula}{regression model formula of a formula \code{object}.}
 
-\item{family}{a description of the error distribution to be used in the model (see \code{elliptical.family} for details of family functions).}
+\item{family}{a description of the error distribution to be used in the model (see \code{\link{family.elliptical}} for details of elliptical distribution).}
 
 \item{data}{an optional data frame, list or environment containing the variables in the model.}
 
 \item{dispersion}{an optional fixed value for dispersion parameter.}
 
-\item{weights}{an optional numeric vector of weights to be used in the fitting process.}
+\item{weights}{an optional numeric vector of \dQuote{prior weights} to be used in the fitting process.}
 
 \item{subset}{an optional numeric vector specifying a subset of observations to be used in the fitting process.}
 
-\item{na.action}{a function which indicates what should happen when the data contain NAs (see \code{glm}).}
+\item{na.action}{a function which indicates what should happen when the data contain NAs (see \code{\link{glm}}).}
 
-\item{method}{optimization method used to estimate the parameters. The default method "elliptical.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.}
+\item{method}{optimization method used to estimate the model parameters. The default method "elliptical.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.}
 
-\item{control}{a list of parameters for controlling the fitting process. For \code{elliptical} this is passed by \code{glm.control}.}
+\item{control}{a list of parameters for controlling the fitting process. This is passed by \code{\link{glm.control}}.}
 
 \item{model}{a logical value indicating whether model frame should be included as a component of the return.}
 
@@ -50,7 +50,7 @@ elliptical(
 
 \item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.}
 
-\item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting as in \code{glm}.}
+\item{offset}{this can be used to specify a \dQuote{prior known component} to be included in the linear predictor during fitting (as in \code{\link{glm}}).}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
@@ -88,7 +88,7 @@ returns an object of class \dQuote{elliptical}, a list with follow components:
 \item{y}{the response variable used.}
 }
 \description{
-The function implements linear elliptical regression models. This models is specified giving a symbolic description of the systematic and stochastic components.
+The function \code{elliptical} is used to fit linear elliptical regression models. This models is specified giving a symbolic description of the systematic and stochastic components.
 }
 \examples{
 data(luzdat)
@@ -105,7 +105,7 @@ elliptical.fitLII <- elliptical(y ~ x1+x2+x3, family = LogisII()
 \references{
 Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
-\url{https://doi.org/10.1016/j.spl.2007.01.012}
+\doi{10.1016/j.spl.2007.01.012}
 
 Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
@@ -114,6 +114,5 @@ Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 \code{\link{glm}}, \code{\link{family.elliptical}}, \code{\link{summary.elliptical}}
 }
 \keyword{Elliptical}
-\keyword{Linear}
 \keyword{models}
 \keyword{regression}

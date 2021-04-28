@@ -1,16 +1,16 @@
-#' @title Analysis of Deviance for Elliptical Model Fits
+#' @title Analysis of Deviance for Elliptical Regression Models
 #' @method anova elliptical
 #' @description Compute an analysis of deviance table for the fitted elliptical regression model.
 #' @param object an object with the result of the fitted elliptical regression model.
-#' @param dispersion the dispersion parameter for the fitting family. If is \code{NULL} (by default) is obtained from object.
-#' @param test a character string containing the hypothesis test considered. By default is used the chi-square test.
-#' @param ... additional objects of the same type.
-#' @return Return an object of class \dQuote{anova}. This object contain the analysis of deviance.
+#' @param dispersion the dispersion parameter for the fitting family. By default it is obtained from the object.
+#' @param test a character string indicating the hypothesis test considered. Only chi-square test is implemented at moment.
+#' @param ... arguments to be used to form the default control argument if it is not supplied directly.
+#' @return Return an object of class \dQuote{anova}. This object contain the analysis of deviance table.
 #' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 #' symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
-#' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
+#' \doi{10.1016/j.spl.2007.01.012} 
 #' @seealso \code{\link{elliptical}}, \code{\link{summary.elliptical}}, \code{\link{family.elliptical}}
-#' @keywords Elliptical models
+#' @keywords Elliptical regression models
 #' @keywords Hypothesis tests
 #' @keywords ANOVA
 #' @examples

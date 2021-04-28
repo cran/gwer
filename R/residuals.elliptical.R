@@ -1,19 +1,17 @@
-#' @title Extract Residuals for Elliptical Model Fits
+#' @title Extract Residuals for Elliptical Regression Model Fits
 #' @method residuals elliptical
-#' @description This function compute differents type of residuals to the fitted elliptical regression model.
+#' @description This function compute different types of residuals to the fitted elliptical regression model.
 #' @param object an object with the result of the fitted elliptical regression model.
-#' @param type a character string that indicates the type of residuals. If is \code{stand} will be computed the standar residuals. 
+#' @param type a character string that indicates the type of residuals. If is \code{stand} will be computed the standard residuals. 
 #' If is \code{ordinal} will be computed the ordinal residuals. If is \code{response} will be computed the response residuals. 
-#' If is \code{pearson} will be computed the pearson residuals. If is \code{desvio} will be computed the desviance residuals.
-#' By default is \code{stand}.
+#' If is \code{pearson} will be computed the Pearson residuals. If is \code{desvio} will be computed the desviance residuals.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
 #' @return Residuals of the specific \code{type} extracted from the \code{object}.
 #' @references Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
 #' symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
-#' \url{https://doi.org/10.1016/j.spl.2005.04.033}
-#' @seealso \code{\link{elliptical}}
-#' @keywords Linear regression models
-#' @keywords Elliptical models
+#' \doi{10.1016/j.spl.2005.04.033}
+#' @seealso \code{\link{residuals}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
+#' @keywords Elliptical regression models
 #' @keywords Residuals
 #' @examples
 #' data(luzdat)

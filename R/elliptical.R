@@ -1,23 +1,23 @@
-#' @title Elliptical Regression Models
+#' @title Fitting Elliptical Regression Models
 #' @import stats
 #' @import assertthat
 #' @name elliptical
 #' @aliases print.elliptical
-#' @description The function implements linear elliptical regression models. This models is specified giving a symbolic description of the systematic and stochastic components.
-#' @param formula regression model formula as in \code{glm}.
-#' @param family a description of the error distribution to be used in the model (see \code{elliptical.family} for details of family functions).
+#' @description The function \code{elliptical} is used to fit linear elliptical regression models. This models is specified giving a symbolic description of the systematic and stochastic components.
+#' @param formula regression model formula of a formula \code{object}.
+#' @param family a description of the error distribution to be used in the model (see \code{\link{family.elliptical}} for details of elliptical distribution).
 #' @param data an optional data frame, list or environment containing the variables in the model.
 #' @param dispersion an optional fixed value for dispersion parameter.
-#' @param weights an optional numeric vector of weights to be used in the fitting process.
+#' @param weights an optional numeric vector of \dQuote{prior weights} to be used in the fitting process.
 #' @param subset an optional numeric vector specifying a subset of observations to be used in the fitting process.
-#' @param na.action a function which indicates what should happen when the data contain NAs (see \code{glm}).
-#' @param method optimization method used to estimate the parameters. The default method "elliptical.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.
-#' @param control a list of parameters for controlling the fitting process. For \code{elliptical} this is passed by \code{glm.control}.
+#' @param na.action a function which indicates what should happen when the data contain NAs (see \code{\link{glm}}).
+#' @param method optimization method used to estimate the model parameters. The default method "elliptical.fit" uses Fisher's scoring method. The alternative "model.frame" returns the model frame and does no fitting.
+#' @param control a list of parameters for controlling the fitting process. This is passed by \code{\link{glm.control}}.
 #' @param model a logical value indicating whether model frame should be included as a component of the return.
 #' @param x a logical value indicating whether the response vector used in the fitting process should be returned as components of the return.
 #' @param y a logical value indicating whether model matrix used in the fitting process should be returned as components of the return.
 #' @param contrasts an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.
-#' @param offset this can be used to specify an a priori known component to be included in the linear predictor during fitting as in \code{glm}.
+#' @param offset this can be used to specify a \dQuote{prior known component} to be included in the linear predictor during fitting (as in \code{\link{glm}}).
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
 #' @return returns an object of class \dQuote{elliptical}, a list with follow components: 
 #' \item{coefficients}{coefficients of location parameters.}
@@ -52,12 +52,11 @@
 #' \item{y}{the response variable used.}
 #' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 #' symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
-#' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
+#' \doi{10.1016/j.spl.2007.01.012} 
 #' @references Fang, K. T., Kotz, S. and NG, K. W. (1990, ISBN:9781315897943).
 #' Symmetric Multivariate and Related Distributions. London: Chapman and Hall.
 #' @seealso \code{\link{glm}}, \code{\link{family.elliptical}}, \code{\link{summary.elliptical}}
-#' @keywords Elliptical models
-#' @keywords Linear regression models
+#' @keywords Elliptical regression models
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y
@@ -105,7 +104,7 @@ elliptical <- function (formula = formula(data), family = Normal, data, dispersi
       cat(paste("\n work with user-defined family:", call$family, 
                 "\n"))
     }
-  if (!missing(dispersion) && is.number(dispersion) && !(dispersion > 
+  if (!missing(dispersion) && is.numeric(dispersion) && !(dispersion > 
                                                          0)) 
     stop("\n no negative values for dispersion parameter")
   Terms <- attr(m, "terms")
@@ -313,12 +312,17 @@ elliptical.fit <- function (X, Y, offset, family, dispersion,
   w.2 <- -2 * w.1
   if (any(w.2 < 0)) 
     cat("\n --- negative iterative weights returned! --- \n")
+  
   if (is.null.disp) {
-    rank <- dim(X)[2]
+    Xd <- cbind(X, residuals) ; rank <- dim(X)[2]
     Rnames <- dimnames(X)[[2]]
-    Xd <- cbind(X, residuals)
+    dimnames(Xd)[[2]] <- c(Rnames, "scale")
+  } else {
+    Xd <- X ; rank <- dim(X)[2]
+    Rnames <- dimnames(X)[[2]]
+    dimnames(Xd)[[2]] <- Rnames
   }
-  dimnames(Xd)[[2]] <- c(Rnames, "scale")
+  
   nn <- is.null(Rnames)
   Rnames <- list(dimnames(Xd)[[2]], dimnames(Xd)[[2]])
   R <- t(Xd) %*% Xd

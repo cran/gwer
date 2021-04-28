@@ -10,14 +10,14 @@
 #' @aliases Student
 #' @aliases LogisI
 #' @aliases LogisII
-#' @description Family object provide an specify the details of the model used by functions such as \code{elliptical} and \code{gwer}. See the documentation for \code{elliptical} or \code{gwer} for more details.
+#' @description The family object provide an specify details of the model used by functions such as \code{\link{elliptical}}, \code{\link{gwer}} and \code{\link{gwer.multiscale}}. The distribution functions are necessary to specify the random component of the regression models with elliptical errors.
 #' @param object an object with the result of the fitted elliptical regression model.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
 #' @return An object of class \dQuote{family} specifying a list with the follows elements:
 #' \item{family}{character: the family name.}
 #' \item{g0, g1, g2, g3, g4, g5}{derived fuctions associated with the distribution family defined.}
-#' \item{df}{degree of freedom for t-student distribution.}
-#' \item{s, r}{shape parameters for generalized t-student distribution.}
+#' \item{df}{degree of freedom for t-Student distribution.}
+#' \item{s, r}{shape parameters for generalized t-Student distribution.}
 #' \item{alpha}{shape parameter for contaminated normal and generalized logistic distributions.}  
 #' \item{mp}{shape parameter for generalized logistic distribution.}
 #' \item{epsi,sigmap}{dispersion parameters for contaminated normal distribution.}
@@ -277,7 +277,7 @@ rpowerexp <- function (n, k = 0.5)
 dgstudent <- function (x, s = 1, r = 2, mean = 0, sd = 1) 
 {
   z <- (x - mean)/sd
-  dens <- (1/sd)(s^(r/2) * gamma(0.5 + r/2))/(gamma(0.5) * 
+  (1/sd)*(s^(r/2) * gamma(0.5 + r/2))/(gamma(0.5) * 
                                                 gamma(r/2)) * (s + z^2)^(-0.5 * (r + 1))
 }
 

@@ -2,9 +2,9 @@
 #' @method summary elliptical
 #' @name summary.elliptical
 #' @aliases print.summary.elliptical
-#' @description This function produce result summary of the result of the fitted elliptical regression model.
+#' @description This function produce summary for the result of the fitted elliptical regression model.
 #' @param object an object with the result of the fitted elliptical regression model.
-#' @param correlation a logical value to return the correlation for the estimated parameters. If \code{FALSE} (by default) not return the correlation matrix.
+#' @param correlation a logical value to return the correlation for the estimated parameters. If \code{TRUE} (by default) return the correlation matrix.
 #' @param ... arguments to be used to form the default control argument if it is not supplied directly.
 #' @return returns an object of class \dQuote{summary.elliptical}, a list with follow components: 
 #' \item{coefficients}{the matrix of coefficients, standard errors and significance values for parameters hypothesis test.}
@@ -14,19 +14,19 @@
 #' \item{corrrelation}{the matrix of correlation for the estimated parameters.}  
 #' \item{family}{family from \code{object}.}
 #' \item{loglik}{the likelihood logarithm value from \code{object}.}
+#' \item{df}{degrees of freedom from \code{object}.}
 #' \item{terms}{the \code{terms} object used.}
-#' \item{df}{degrees of fredom from \code{object}.}
 #' \item{inter}{number of iterations of optimization process.}
 #' \item{nas}{a logical vector indicating if there is \code{na} in estimation of coefficients.}
+#' \item{type}{a character string indicating the type of residuals was obtained from \code{object}}
 #' \item{call}{the matched call from \code{object}.}
 #' \item{scale}{values of the \code{4d_g} for the specified distribution from \code{object}.}
 #' \item{scaledispersion}{values of the \code{4f_g} for the specified distribution from \code{object}.}
 #' @references Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 #' symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
-#' \url{https://doi.org/10.1016/j.spl.2007.01.012} 
-#' @seealso \code{\link{glm}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
-#' @keywords Elliptical models
-#' @keywords Linear regression models
+#' \doi{10.1016/j.spl.2007.01.012} 
+#' @seealso \code{\link{summary}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
+#' @keywords Elliptical regression models
 #' @examples
 #' data(luzdat)
 #' y <- luzdat$y
@@ -48,7 +48,7 @@ summary.elliptical<-function(object, correlation = TRUE,...)
   scale <- object$scale
   scaledispersion <- object$scaledispersion
   fixed <- object$fixed
-  resid <- object$residuals
+  resid <- residuals.elliptical(object, type = object$type)
   wt <- object$weights
   nas <- is.na(coef)
   n <- length(resid) - sum(wt == 0)
@@ -87,13 +87,12 @@ summary.elliptical<-function(object, correlation = TRUE,...)
   }
   else correl <- NULL
 
-  summary <- list(coefficients = coef, dispersion = disp, 
-                  fixed = fixed, residuals = resid, cov.unscaled = covun[(1:p),(1:p)], 
+  summary <- list(coefficients = coef, dispersion = disp, fixed = fixed, 
+                  residuals = resid, cov.unscaled = covun[(1:p),(1:p)], 
                   correlation = correl[(1:p), (1:p)], family = object$family, 
                   loglik = object$loglik, terms = object$terms, df = c(p, rdf, n), 
                   iter = object$iter, nas = nas, call = object$call, scale = scale,
                   scaledispersion = scaledispersion)
-#  class(summary) <- "summary"
   attr(summary, "class") <- c("summary.elliptical")
   summary
 }

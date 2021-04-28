@@ -10,7 +10,7 @@
 \arguments{
 \item{object}{an object with the result of the fitted elliptical regression model.}
 
-\item{correlation}{a logical value to return the correlation for the estimated parameters. If \code{FALSE} (by default) not return the correlation matrix.}
+\item{correlation}{a logical value to return the correlation for the estimated parameters. If \code{TRUE} (by default) return the correlation matrix.}
 
 \item{...}{arguments to be used to form the default control argument if it is not supplied directly.}
 }
@@ -23,16 +23,17 @@ returns an object of class \dQuote{summary.elliptical}, a list with follow compo
 \item{corrrelation}{the matrix of correlation for the estimated parameters.}  
 \item{family}{family from \code{object}.}
 \item{loglik}{the likelihood logarithm value from \code{object}.}
+\item{df}{degrees of freedom from \code{object}.}
 \item{terms}{the \code{terms} object used.}
-\item{df}{degrees of fredom from \code{object}.}
 \item{inter}{number of iterations of optimization process.}
 \item{nas}{a logical vector indicating if there is \code{na} in estimation of coefficients.}
+\item{type}{a character string indicating the type of residuals was obtained from \code{object}}
 \item{call}{the matched call from \code{object}.}
 \item{scale}{values of the \code{4d_g} for the specified distribution from \code{object}.}
 \item{scaledispersion}{values of the \code{4f_g} for the specified distribution from \code{object}.}
 }
 \description{
-This function produce result summary of the result of the fitted elliptical regression model.
+This function produce summary for the result of the fitted elliptical regression model.
 }
 \examples{
 data(luzdat)
@@ -48,12 +49,11 @@ summary(elliptical.fitt)
 \references{
 Cysneiros, F. J. A., Paula, G. A., and Galea, M. (2007). Heteroscedastic 
 symmetrical linear models. Statistics & probability letters, 77(11), 1084-1090. 
-\url{https://doi.org/10.1016/j.spl.2007.01.012}
+\doi{10.1016/j.spl.2007.01.012}
 }
 \seealso{
-\code{\link{glm}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
+\code{\link{summary}}, \code{\link{elliptical}}, \code{\link{family.elliptical}}
 }
 \keyword{Elliptical}
-\keyword{Linear}
 \keyword{models}
 \keyword{regression}

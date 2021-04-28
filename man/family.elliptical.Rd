@@ -52,15 +52,15 @@ Cnormal(parmt = stop("no epsi or sigma argument"))
 An object of class \dQuote{family} specifying a list with the follows elements:
 \item{family}{character: the family name.}
 \item{g0, g1, g2, g3, g4, g5}{derived fuctions associated with the distribution family defined.}
-\item{df}{degree of freedom for t-student distribution.}
-\item{s, r}{shape parameters for generalized t-student distribution.}
+\item{df}{degree of freedom for t-Student distribution.}
+\item{s, r}{shape parameters for generalized t-Student distribution.}
 \item{alpha}{shape parameter for contaminated normal and generalized logistic distributions.}  
 \item{mp}{shape parameter for generalized logistic distribution.}
 \item{epsi,sigmap}{dispersion parameters for contaminated normal distribution.}
 \item{k}{shape parameter for power exponential distribution.}
 }
 \description{
-Family object provide an specify the details of the model used by functions such as \code{elliptical} and \code{gwer}. See the documentation for \code{elliptical} or \code{gwer} for more details.
+The family object provide an specify details of the model used by functions such as \code{\link{elliptical}}, \code{\link{gwer}} and \code{\link{gwer.multiscale}}. The distribution functions are necessary to specify the random component of the regression models with elliptical errors.
 }
 \examples{
 data(luzdat)

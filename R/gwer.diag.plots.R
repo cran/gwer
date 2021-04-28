@@ -3,54 +3,41 @@
 #' @import graphics
 #' @description This function generate diagnostic measures plots for the fitted geographically weighted elliptical regression models.
 #' @param object an object with the result of the fitted geographically weighted elliptical regression models.
-#' @param gwerdiag objects containing the diagnostic measures. If is \code{NULL} (by default) is obtained from object.
-#' @param which an optional numeric value with the number of plot returned.
+#' @param gwerdiag object list containing the diagnostic measures. By default it is obtained from the object, but can be calculated using \code{\link{gwer.diag}}.
+#' @param which an optional numeric value with the number of only plot that must be returned.
 #' @param subset an optional numeric vector specifying a subset of observations to be used in the fitting process.
-#' @param iden a logical value used to identify observations. If \code{TRUE} the observations are identified in the graphic window.
-#' @param labels a optinal string vector specifying a labels plots.
-#' @param ret a logical value to return the diagnostic measures computing. If \code{FALSE} (by default) not return the diagnostic measures.
+#' @param iden a logical value used to identify observations. If \code{TRUE} the observations are identified by user in the graphic window.
+#' @param labels a optional string vector specifying a labels plots.
+#' @param ret a logical value used to return the diagnostic measures computing. If \code{TRUE} the diagnostic measures are returned (see \code{\link{gwer.diag}} for more details).
 #' @param ... graphics parameters to be passed to the plotting routines.
-#' @return Return an interactive menu with eleven options to make plots. This menu contains the follows graphics :
+#' @return Return an interactive menu with eleven options to make plots. This menu contains the follows graphics:
 #' 1: plot: All.
 #' 2: plot: Response residual against fitted values.
-#' 3: plot: Moran dispersion of the response residual.
+#' 3: plot: Response residual against index.
 #' 4: plot: Standardized residual against fitted values.
-#' 5: plot: Moran dispersion of the standardized residual.
-#' 6: plot: QQ-plot of  response residuals.
-#' 7: plot: QQ-plot of  Standardized residuals.
-#' 8: plot: Generalized Leverage.
-#' 9: plot: Local influence on the response against index.
-#' 10: plot: Local influence on the scale against index.
-#' 11: plot: Local influence for case-weight against index.
-#' If \code{which} is provided return an unique graphic selected. If \code{ret} is \code{TRUE} returns a list of diagnostic arrays 
-#' (see \code{gwer.diag} for more details).
+#' 5: plot: Standardized residual against index.
+#' 6: plot: QQ-plot of response residuals.
+#' 7: plot: QQ-plot of standardized residuals.
+#' 8: plot: Generalized leverage.
+#' 9: plot: Total local influence index plot for response perturbation.
+#' 10: plot: Total local influence index plot scale perturbation.
+#' 11: plot: Total local influence index plot case-weight perturbation.
 #' @references Galea, M., Paula, G. A., and Cysneiros, F. J. A. (2005). On diagnostics in 
 #' symmetrical nonlinear models. Statistics & Probability Letters, 73(4), 459-467.
-#' \url{https://doi.org/10.1016/j.spl.2005.04.033}
-#' @seealso \code{\link{elliptical}}, \code{\link{elliptical.diag}}
+#' \doi{10.1016/j.spl.2005.04.033}
+#' @seealso \code{\link{gwer}}, \code{\link{gwer.diag}}
 #' @keywords Geographically Weighted Regression
-#' @keywords Elliptical models
+#' @keywords Elliptical regression models
 #' @keywords Diagnostic methods
 #' @examples
-#' data(columbus, package="spData")
-#' fit.lm <- lm(CRIME ~ INC, data=columbus)
-#' summary(fit.lm)
-#' gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Normal(),
-#'                  coords=cbind(columbus$X, columbus$Y))
-#' gwer.fitn <- gwer(CRIME ~ INC, family = Normal(), bandwidth = gwer.bw, hatmatrix = TRUE,
-#'                  spdisp = TRUE, parplot = FALSE, data=columbus, method = "gwer.fit",
-#'                  coords=cbind(columbus$X, columbus$Y))
-#' gwer.diag.plots(gwer.fitn, which=3)  
 #' \donttest{
-#' data(columbus, package="spData")
-#' fit.elliptical <- elliptical(CRIME ~ INC, family = Student(df=4), data=columbus)
-#' summary(fit.elliptical)
-#' gwer.bw <- gwer.sel(CRIME ~ INC, data=columbus, family = Student(df=4),
-#'                  coords=cbind(columbus$X, columbus$Y), method = 'aic')
-#' gwer.fitt <- gwer(CRIME ~ INC, family = Student(df=4), bandwidth = gwer.bw, hatmatrix = TRUE,
-#'                  spdisp = TRUE, parplot = TRUE, data=columbus, method = "gwer.fit",
-#'                  coords=cbind(columbus$X, columbus$Y))
-#' gwer.diag.plots(gwer.fitt, which=3)    
+#' data(georgia, package = "spgwr")
+#' fit.formula <- PctBach ~ TotPop90 + PctRural + PctFB + PctPov
+#' gwer.bw.t <- bw.gwer(fit.formula, data = gSRDF, family = Student(3), adapt = TRUE)
+#' gwer.fit.t <- gwer(fit.formula, data = gSRDF, family = Student(3), bandwidth = gwer.bw.t, 
+#'                    adapt = TRUE, parplot = FALSE, hatmatrix = TRUE, spdisp = TRUE, 
+#'                    method = "gwer.fit")
+#' gwer.diag.plots(gwer.fit.t, which=3)
 #' }
 #' @export
 
@@ -58,12 +45,12 @@
 gwer.diag.plots <- function (object, gwerdiag = NULL, which, subset = NULL, 
                               iden = F, labels = NULL, ret = F,...) 
 {
-  if(object$fp.given || !object$hatmatrix) 
+  if(!object$hatmatrix) 
     stop("Diagnostic measures not applicable - regression points different from observed points")
   
   if (is.null(gwerdiag)) {
     family <- object$family
-    user.def <- object$user.def
+    user.def <- object$lm$user.def
     f.name <- family[[1]]
     gwerdiag <- gwer.diag(object)
   }
@@ -85,11 +72,12 @@ gwer.diag.plots <- function (object, gwerdiag = NULL, which, subset = NULL,
   wzero <- (w == 0)
 
   choices <- c("All", "Response residual against fitted values", 
-               "Moran dispersion of the response residual.", "Standardized residual against fitted values", 
-               "Moran dispersion of the standardized residual", "QQ-plot of  response residuals", 
-               "QQ-plot of  Standardized residuals", "Generalized Leverage", 
-               "Local influence on the response against index", "Local influence on the scale against index", 
-               "Local influence for case-weight against index\n")
+               "Response residual against index", "Standardized residual against fitted values", 
+               "Standardized residual against index", "QQ-plot of response residuals", 
+               "QQ-plot of standardized residuals", "Generalized leverage", 
+               "Total local influence index plot for response perturbation", 
+               "Total local influence index plot scale perturbation", 
+               "Total local influence index plot case-weight perturbation\n")
   tmenu <- paste("plot:", choices)
   if (missing(which)) 
     pick <- menu(tmenu, title = "\n Make a plot selection (or 0 to exit)\n")
@@ -176,7 +164,7 @@ gwer.diag.plots <- function (object, gwerdiag = NULL, which, subset = NULL,
       plot(x8, y8, xlab = "Index", ylab = "|Lmax|", ylim = c(0,1), ...) ; abline(2/nobs,0)
       xx <- list(x5, x6, x7, x8)
       yy <- list(y5, y6, y7, y8)
-      if (is.null(labels)) labels <- names(model.extract(model.frame(object), 
+      if (is.null(labels)) labels <- names(model.extract(model.frame(object$lm), 
                                                          "response"))
       yes <- iden
       while (yes) {
